@@ -83,13 +83,13 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True):
         plt.show()
 
 def plot_diffusivity():
-    lines = read_file_lines('selfdiffusivity.dat', [0, 1, 2], skip=3, column_major=True)
+    lines = read_file_lines('./../data/H2O/selfdiffusivity.dat', [0, 1, 2], skip=3, column_major=True)
     
     plot('Diffusivity!', 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['Hydrogen', 'Oxygen'])
 
 
 def plot_viscosity():
-    lines = read_file_lines('viscosity.dat', [0, 8, 9], skip=3, column_major=True)
+    lines = read_file_lines('./../data/H2O/viscosity.dat', [0, 8, 9], skip=3, column_major=True)
     plot('Plot of viscosity!', 'Time', 'Viscosity', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'])
 
 plot_diffusivity()
