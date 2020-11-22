@@ -3,6 +3,7 @@ import os
 import random
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
+import re
 
 def compute_averaged_values():
     """Computes the average values of multiple simulations.
@@ -10,7 +11,7 @@ def compute_averaged_values():
     pass
 
 
-def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separator=' '):
+def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separator='[\t ]'):
     """Reads real values from the columns from a file.
 
     Args:
@@ -35,8 +36,7 @@ def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separat
     lines = f.readlines()[skip:]
 
     # Select columns
-    res = [[np.float64(line[col]) for col in cols] for line in [l.strip().split(separator) for l in lines]]
-
+    res = [[np.float64(line[col]) for col in cols] for line in [re.split(separator, l.strip()) for l in lines]]
     return np.transpose(res) if column_major else res
 
 def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True):
@@ -54,15 +54,15 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True):
 
     assert len(labels) == len(vals)
     
+    # Set up plot
+    plt.figure(title)
+    plt.clf()
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
     # Plot for each pair of values and labels
     for value, label in zip(vals, labels):
-
-        # Set up plot
-        plt.clf()
-        plt.title(title)
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
 
         # Compute the slope for a particular set of values
         slope = linregress(grid, value).slope
@@ -84,15 +84,20 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True):
 
 def plot_diffusivity():
     lines = read_file_lines('./../data/H2O/selfdiffusivity.dat', [0, 1, 2], skip=3, column_major=True)
-    
-    plot('Diffusivity!', 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['Hydrogen', 'Oxygen'])
-
+    plot('Plot of diffusivity', 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['Hydrogen', 'Oxygen'])
 
 def plot_viscosity():
     lines = read_file_lines('./../data/H2O/viscosity.dat', [0, 8, 9], skip=3, column_major=True)
-    plot('Plot of viscosity!', 'Time', 'Viscosity', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'])
+    plot('Plot of viscosity', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'])
+
+def plot_rdf():
+    lines = read_file_lines('./../data/H2O/rdf.dat', [0, 2, 4, 6], skip=1, column_major=True)
+    plot('Plot of radial distribution function (rdf)', 'Radius', r'Density', lines[0], lines[1:], ['Hydrogen-Hydrogen', 'Hydrogen-Oxygen', 'Oxygen-Oxygen'])
+    
 
 plot_diffusivity()
 
 plot_viscosity()
+
+plot_rdf()
 
