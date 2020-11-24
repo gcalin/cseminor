@@ -127,10 +127,10 @@ visc = plot_viscosity()
 visc[0]=visc[0]/T #shear viscosity
 visc[1]=visc[1]/T #bulk viscosity
 
-print("Self diffusion constant of Hydrogen:", self_diff[0])
-print("Self diffusion constant of Oxygen:", self_diff[1])
-print("Shear viscosity of water:", visc[0])
-print("Bulk viscosity of water:", visc[1])
+print("Self diffusion constant of Hydrogen:", self_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Self diffusion constant of Oxygen:", self_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Shear viscosity of water:", visc[0], "atm*femtoseconds = 1.01325·10^−10 Pas." )
+print("Bulk viscosity of water:", visc[1], "atm*femtoseconds = 1.01325·10^−10 Pas.")
 
 plot_rdf()
 
