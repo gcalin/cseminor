@@ -76,8 +76,8 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True):
             plt.loglog(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
             
         else:
-            plt.plot(grid, value, c=(random.random(), random.random(), random.random()), label=label)
-            plt.plot(grid, slope*grid, '--', label = "slope of " + label)
+            plt.plot(grid, value, c= random_color, label=label, marker='o')
+            plt.plot(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
 
         plt.legend()        
         plt.show()
