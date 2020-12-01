@@ -167,7 +167,7 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         return None
 
 # TODO: remove global variable in the future
-paths = ['./../data/H2O/run1/', './../data/H2O/run2/', './../data/H2O/run3/']
+paths = ['./../data/H2O/run1/', './../data/H2O/run2/', './../data/H2O/run3/', './../data/H2O/run5/']
 '''
 def plot_diffusivity():
 
@@ -188,7 +188,7 @@ def plot_diffusivity():
 
     # Particular filenames for diffusivity
     filenames = [path + 'selfdiffusivity.dat' for path in paths]
-    linearParts = [[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]]] #[None, None, None]
+    linearParts = [[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
     self_diff = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
         file = filenames[i]
@@ -202,7 +202,7 @@ def plot_viscosity():
 
     # Particular filenames for viscosity
     filenames = [path + 'viscosity.dat' for path in paths]
-    linearParts = [[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]]] #[None, None, None]
+    linearParts = [[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
     visc = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
         file = filenames[i]
