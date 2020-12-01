@@ -120,6 +120,10 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
     
     slopes = []
 
+    #this needs to be outside of the for loop, otherwise not all graphs will be plotted.
+    plt.figure(title)
+    plt.clf()
+
     # Plot for each pair of values and labels
     for i in range(len(labels)):
         value = vals[i]
@@ -129,6 +133,7 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         if linear == None:
             slope = linregress(grid, value).slope
         else:
+            #linear regression on the linear part of the graph
             start = linear[i][0]
             end = linear[i][1]
             slope = linregress(grid[start:end], value[start:end]).slope
@@ -138,7 +143,6 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         random_color = (random.random(), random.random(), random.random())
 
         # Set up plot
-        plt.clf()
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
@@ -164,7 +168,7 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
 
 # TODO: remove global variable in the future
 paths = ['./../data/H2O/run1/', './../data/H2O/run2/', './../data/H2O/run3/']
-
+'''
 def plot_diffusivity():
 
     # Particular filenames for diffusivity
@@ -179,20 +183,33 @@ def plot_diffusivity():
     err = compute_errors_per_column(filenames, [1,2], skip=3, column_major=True)
     plot('Errors in diffusivity', 'Time', r'100*stddev/mean', np.log10(lines[0]), err, ['Hydrogen', 'Oxygen'], loglog=False, linear=None, show_slope=False)
     return self_diff
+'''
+def plot_diffusivity():
+
+    # Particular filenames for diffusivity
+    filenames = [path + 'selfdiffusivity.dat' for path in paths]
+    linearParts = [[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]]] #[None, None, None]
+    self_diff = np.zeros((len(filenames), 2))
+    for i in range(len(filenames)):
+        file = filenames[i]
+        linearPart = linearParts[i]
+        # Read the lines and plot the results
+        lines = read_file_lines(file, [0, 1, 2], skip=3, column_major=True)
+        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['Hydrogen', 'Oxygen'], linear=linearPart)   
+    return self_diff
 
 def plot_viscosity():
 
     # Particular filenames for viscosity
     filenames = [path + 'viscosity.dat' for path in paths]
-    #lines = read_file_lines('./../data/H2O/run1/viscosity.dat', [0, 8, 9], skip=3, column_major=True)   
-
-    # Read the lines and plot the results
-    lines = compute_averaged_values(filenames, [0,8,9], skip=3, column_major=True)
-    visc = plot('Plot of viscosity', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=[[23,39], [24,36]])
-
-    # Get the array of errors at each point and plot
-    err = compute_errors_per_column(filenames, [8,9], skip=3, column_major=True)
-    plot('Errors in viscosity', 'Time', r'100*stddev/mean', np.log10(lines[0]), err, ['MSD_all', 'MSD_bulkvisc'], loglog=False, linear=None, show_slope=False)
+    linearParts = [[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]]] #[None, None, None]
+    visc = np.zeros((len(filenames), 2))
+    for i in range(len(filenames)):
+        file = filenames[i]
+        linearPart = linearParts[i]
+        # Read the lines and plot the results
+        lines = read_file_lines(file, [0, 8, 9], skip=3, column_major=True)
+        visc[i,:]=plot('Plot of viscosity '+str(i+1), 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearPart)
     return visc
 
 def plot_rdf():
@@ -203,18 +220,29 @@ def plot_rdf():
     
 N=800 #number of molecules
 self_diff = plot_diffusivity()
-self_diff[0] = self_diff[0]/(2*N) #Hydrogen
-self_diff[1] = self_diff[1]/N #Oxygen
+for i in range(len(self_diff)):
+    if ((self_diff[i] !=  None).all()):
+        self_diff[i][0] = self_diff[i][0]/(2*N) #Hydrogen
+        self_diff[i][1] = self_diff[i][1]/N #Oxygen
 
 T=303.15 #temperature
 visc = plot_viscosity()
-visc[0]=visc[0]/T #shear viscosity
-visc[1]=visc[1]/T #bulk viscosity
+for i in range(len(visc)):
+    if ((visc[i] != None).all()):
+        visc[i][0]=visc[i][0]/T #shear viscosity
+        visc[i][1]=visc[i][1]/T #bulk viscosity
+    
+#calculate average and standard deviation
+avg_diff = np.average(self_diff, 0)
+avg_visc = np.average(visc, 0)
 
-print("Self diffusion constant of Hydrogen:", self_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("Self diffusion constant of Oxygen:", self_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("Shear viscosity of water:", visc[0], "atm*femtoseconds = 1.01325·10^−10 Pas." )
-print("Bulk viscosity of water:", visc[1], "atm*femtoseconds = 1.01325·10^−10 Pas.")
+std_diff = np.std(self_diff, 0)
+std_visc = np.std(visc, 0)
+
+print("Self-diffusion constant of Hydrogen:", avg_diff[0], "+/-", std_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Self-diffusion constant of Oxygen:", avg_diff[1], "+/-", std_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Shear viscosity of water:", avg_visc[0], "+/-", std_visc[0], "atm*femtoseconds = 1.01325·10^−10 Pas." )
+print("Bulk viscosity of water:", avg_visc[1], "+/-", std_visc[1], "atm*femtoseconds = 1.01325·10^−10 Pas.")
 
 plot_rdf()
 
