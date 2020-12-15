@@ -148,15 +148,15 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         plt.ylabel(ylabel)
 
         # Plot the values and the slope
-        if loglog:
+        if value[0]>0:
             plt.loglog(grid, value, c=random_color, label=label, marker='o')
             if show_slope:
                 plt.loglog(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
             
         else:
-            plt.plot(grid, value, c=random_color, label=label, marker='o')
+            plt.loglog(grid, np.abs(value), c=random_color, label=label+'(negative)', marker='o')
             if show_slope:
-                plt.plot(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
+                plt.loglog(grid, np.abs(slope*grid), '--', c=random_color, label = "slope of " + label)
 
         plt.legend()        
         plt.show()
@@ -173,7 +173,7 @@ def plot_diffusivity():
 
     # Particular filenames for diffusivity
     filenames = paths + 'selfdiffusivity.dat'
-    linearParts = [[14,36],[11,36]]#, [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
+    linearParts = [[20,40],[33,36]]#, [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
     self_diff = np.zeros((1, 2))
     file = filenames
     #linearPart = linearParts[i]
@@ -186,7 +186,7 @@ def plot_viscosity():
 
     # Particular filenames for viscosity
     filenames = paths + 'viscosity.dat'
-    linearParts = [[29,44],[29,39]]#, [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
+    linearParts = [[19,59],[42,49]]#, [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
     visc = np.zeros((1, 2))
     file = filenames
     #linearPart = linearParts[i]
@@ -195,21 +195,42 @@ def plot_viscosity():
     visc=plot('Plot of viscosity ', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearParts)
     return visc
 
+def plot_MS_diffusivity():
+
+    # Particular filenames for MS diffusivity
+    filenames = paths + 'onsagercoefficient.dat'
+    linearParts = [[21,31],[13,29],[11,29]]#, [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
+    MS_diff = np.zeros((1, 3))
+    file = filenames
+    #linearPart = linearParts[i]
+    # Read the lines and plot the results
+    lines = read_file_lines(file, [0, 1, 2, 3], skip=3, column_major=True)
+    MS_diff = plot('Plot of MS diffusivity ', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['water-water', 'water-NaCl', 'NaCl-NaCl'], linear=linearParts)
+    return MS_diff
+
     
 #number of molecules
 self_diff = plot_diffusivity()
-print(self_diff)
+#print(self_diff)
 if (self_diff != None):
     self_diff[0] = self_diff[0]/3000 #water
     self_diff[1] = self_diff[1]/54 #NaCl
 
 T=298.15 #temperature
 visc = plot_viscosity()
-print(visc)
+#print(visc)
 if ((visc != None)):
     visc[0]=visc[0]/T #shear viscosity
     visc[1]=visc[1]/T #bulk viscosity
-    
+
+N=3108 #temperature
+MS_diff = plot_MS_diffusivity()
+#print(MS_diff)
+if ((MS_diff != None)):
+    MS_diff[0]=MS_diff[0]/N #water-water diffusivity
+    MS_diff[1]=MS_diff[1]/N #water-NaCl diffusivity
+    MS_diff[2]=MS_diff[2]/N #Na_Cl-NaCl diffusivity
+"""   
 # calculate average and standard deviation
 avg_diff = np.average(self_diff, 0)
 avg_visc = np.average(visc, 0)
@@ -217,13 +238,16 @@ avg_visc = np.average(visc, 0)
 std_diff = np.std(self_diff, 0)
 std_visc = np.std(visc, 0)
 # documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
-
+"""
 print("Self-diffusion constant of water:",self_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
 print("Self-diffusion constant of NaCl:",self_diff[1],"angstrom^2/femtosecond = 10^-5 m^2/s." )
 
 print("Shear viscosity of the system:",visc[0],"atm*femtoseconds = 1.01325·10^−10 Pas.")
 print("Bulk viscosity of the system:",visc[1],"atm*femtoseconds = 1.01325·10^−10 Pas.")
 
+print("MS_Diffusivity of water-water:",MS_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS_Diffusivity of water-NaCl:",MS_diff[1],"angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS_Diffusivity of NaCl-NaCl:",MS_diff[2],"angstrom^2/femtosecond = 10^-5 m^2/s.")
 
 """
 print("Self-diffusion constant of water:%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0]))
