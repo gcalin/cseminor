@@ -223,13 +223,13 @@ if ((visc != None)):
     visc[0]=visc[0]/T #shear viscosity
     visc[1]=visc[1]/T #bulk viscosity
 
-N=3108 #temperature
+N=3054 #number of molecules
+mf_water=3000/N # mole fraction
+mf_NaCl=54/N # mole fraction
 MS_diff = plot_MS_diffusivity()
 #print(MS_diff)
 if ((MS_diff != None)):
-    MS_diff[0]=MS_diff[0]/N #water-water diffusivity
-    MS_diff[1]=MS_diff[1]/N #water-NaCl diffusivity
-    MS_diff[2]=MS_diff[2]/N #Na_Cl-NaCl diffusivity
+    MS_diff = mf_NaCl/mf_water*MS_diff[0] + mf_water/mf_NaCl*MS_diff[2]-2*MS_diff[1] #MS_diffusivity
 """   
 # calculate average and standard deviation
 avg_diff = np.average(self_diff, 0)
@@ -245,9 +245,7 @@ print("Self-diffusion constant of NaCl:",self_diff[1],"angstrom^2/femtosecond = 
 print("Shear viscosity of the system:",visc[0],"atm*femtoseconds = 1.01325·10^−10 Pas.")
 print("Bulk viscosity of the system:",visc[1],"atm*femtoseconds = 1.01325·10^−10 Pas.")
 
-print("MS_Diffusivity of water-water:",MS_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("MS_Diffusivity of water-NaCl:",MS_diff[1],"angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("MS_Diffusivity of NaCl-NaCl:",MS_diff[2],"angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS_Diffusivity of the system:",MS_diff,"angstrom^2/femtosecond = 10^-5 m^2/s.")
 
 """
 print("Self-diffusion constant of water:%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0]))
