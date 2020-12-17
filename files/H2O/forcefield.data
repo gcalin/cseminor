@@ -1,0 +1,27 @@
+# ----------------- INTERMOLECULAR POTENTIAL -------------------
+
+pair_style lj/cut/coul/long 10
+
+pair_coeff 1 1 0.000 0.000	
+pair_coeff 1 2 0.000 0.000	
+pair_coeff 2 2 0.15535 3.1656    # O-O
+
+bond_style  harmonic
+bond_coeff  1 450 1.000
+
+angle_style harmonic
+angle_coeff 1 55 109.47
+
+dihedral_style none 
+improper_style none
+
+kspace_style pppm 1.0e-6
+
+set type 1 charge +0.4238
+set type 2 charge -0.8476
+
+
+
+
+
+

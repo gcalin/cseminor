@@ -1,0 +1,26 @@
+# ----------------- INTERMOLECULAR POTENTIAL -------------------
+
+pair_style lj/cut/coul/long 12.5 12.5
+
+pair_coeff 1 1 0.4598  2.350 # Na-Na
+pair_coeff 2 2 0.45064 4.42  # Cl-Cl
+pair_coeff 3 3 0.650   3.166 # O-O
+pair_coeff 4 4 0.000   0.000 # H-H	
+pair_modify mix arithmetic
+
+bond_style  harmonic
+bond_coeff  1 527.2 1.000
+
+angle_style harmonic
+angle_coeff 1 37.95 109.47
+
+dihedral_style none 
+improper_style none
+
+kspace_style pppm 1.0e-6
+
+set type 1 charge +1.0000 #Na
+set type 2 charge -1.0000 #Cl
+set type 3 charge -0.8476 #O
+set type 4 charge +0.4238 #H
+

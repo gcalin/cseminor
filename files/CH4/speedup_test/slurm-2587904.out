@@ -1,0 +1,10 @@
+/var/lib/slurm-llnl/slurmd/job2587904/slurm_script: line 4: SBATCH: command not found
+/var/lib/slurm-llnl/slurmd/job2587904/slurm_script: line 5: SBATCH: command not found
+--------------------------------------------------------------------------
+There are not enough slots available in the system to satisfy the 24 slots 
+that were requested by the application:
+  /home/noura/LAMMPS/tests/src_v05/lmp_mpi
+
+Either request fewer slots for your application, or make more slots available
+for use.
+--------------------------------------------------------------------------

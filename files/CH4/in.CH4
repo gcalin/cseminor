@@ -1,0 +1,47 @@
+# Methane 
+units		real
+dimension	3
+atom_style	atomic
+boundary	p p p
+
+# Create the simulation box 
+lattice		fcc 3
+region		box block 0 10 0 10 0 10
+create_box	1 box
+create_atoms	1 box
+
+# Properties of methane 
+mass		1 16
+
+pair_style	lj/cut 14
+pair_coeff	1 1 1.0 0.294 3.73
+
+
+# System conditions 
+variable Temp  equal	283.13 
+variable Pres  equal 	1.00
+
+# For lammps  
+neighbor	2.0 bin
+neigh_modify	every 1 delay 0 check no
+
+# Initial velocity 
+velocity	all create ${Temp} 62909
+
+# Equilibrate the system 
+fix integrate_1 all npt temp ${Temp} ${Temp} 100.0 iso ${Pres} ${Pres} 1000.0
+thermo 100
+run 200000
+reset_timestep 0
+
+# Ensemble set up and output   
+fix integrate_2 all npt temp ${Temp} ${Temp} 100.0 iso ${Pres} ${Pres} 1000.0
+
+variable Dens equal density
+fix DensAve all ave/time 10 50 500 v_Dens file Density.dat
+
+dump		1 all xyz 100 trajec.xyz
+
+# Run 
+thermo		100
+run		10000
