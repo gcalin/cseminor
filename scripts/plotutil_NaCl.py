@@ -113,7 +113,7 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
     Returns:
         slopes ([float], optinal): contains the slopes of the linear parts if linear is not None.
     """
-
+    
     assert len(labels) == len(vals)
     if linear != None:
         assert len(labels) == len(linear)
@@ -141,6 +141,7 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
 
         # Generate a random (RGB) color. For common style, we should probably remove this in the future
         random_color = (random.random(), random.random(), random.random())
+        print(slopes)
 
         # Set up plot
         plt.title(title)
@@ -148,15 +149,20 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         plt.ylabel(ylabel)
 
         # Plot the values and the slope
-        if value[0]>0:
-            plt.loglog(grid, value, c=random_color, label=label, marker='o')
-            if show_slope:
-                plt.loglog(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
-            
+        if loglog:
+            if (value[0]>0):
+                plt.loglog(grid, value, c=random_color, label=label, marker='o')
+                if show_slope:
+                    plt.loglog(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
+                
+            else:
+                plt.loglog(grid, np.abs(value), c=random_color, label=label+'(negative)', marker='o')
+                if show_slope:
+                    plt.loglog(grid, np.abs(slope*grid), '--', c=random_color, label = "slope of " + label)
         else:
-            plt.loglog(grid, np.abs(value), c=random_color, label=label+'(negative)', marker='o')
+            plt.plot(grid, value, c=random_color, label=label, marker='o')
             if show_slope:
-                plt.loglog(grid, np.abs(slope*grid), '--', c=random_color, label = "slope of " + label)
+                plt.plot(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
 
         plt.legend()        
         plt.show()
@@ -168,6 +174,19 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
 
 # TODO: remove global variable in the future
 paths = './../data/NaCl/'
+
+def plot_total_energy():
+
+    # Particular filenames for diffusivity
+    filenames = paths + 'TotalEnergy.dat'
+    #linearParts = [[20,40],[33,36]]#, [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
+    #self_diff = np.zeros((1, 2))
+    #file = filenames
+    #linearPart = linearParts[i]
+    # Read the lines and plot the results
+    lines = read_file_lines(filenames, [0, 1], skip=3, column_major=True)
+    self_diff=plot('Plot of Total Energy ', 'Time', 'Total Energy', lines[0], lines[1:], ['Total Energy'], loglog=False, show_slope=False)
+    #return self_diff
 
 def plot_diffusivity():
 
@@ -208,8 +227,8 @@ def plot_MS_diffusivity():
     MS_diff = plot('Plot of MS diffusivity ', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['water-water', 'water-NaCl', 'NaCl-NaCl'], linear=linearParts)
     return MS_diff
 
-    
-#number of molecules
+plot_total_energy()  
+
 self_diff = plot_diffusivity()
 #print(self_diff)
 if (self_diff != None):
@@ -222,6 +241,13 @@ visc = plot_viscosity()
 if ((visc != None)):
     visc[0]=visc[0]/T #shear viscosity
     visc[1]=visc[1]/T #bulk viscosity
+
+kb=1.38064852e-23 # Boltzmann's constant
+e=2.837298 #Constant
+L=7.20198e-24*1.01325 # Length of the box (also including units adaptation)
+correct_self_diff=[0,0]
+correct_self_diff[0] = self_diff[0] + (kb*T*e)/(6*np.pi*visc[0]*L)
+correct_self_diff[1] = self_diff[1] + (kb*T*e)/(6*np.pi*visc[0]*L)
 
 N=3054 #number of molecules
 mf_water=3000/N # mole fraction
@@ -241,6 +267,8 @@ std_visc = np.std(visc, 0)
 """
 print("Self-diffusion constant of water:",self_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
 print("Self-diffusion constant of NaCl:",self_diff[1],"angstrom^2/femtosecond = 10^-5 m^2/s." )
+print("Corrected self-diffusion constant of water:",correct_self_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Corrected self-diffusion constant of NaCl:",correct_self_diff[1],"angstrom^2/femtosecond = 10^-5 m^2/s." )
 
 print("Shear viscosity of the system:",visc[0],"atm*femtoseconds = 1.01325·10^−10 Pas.")
 print("Bulk viscosity of the system:",visc[1],"atm*femtoseconds = 1.01325·10^−10 Pas.")
