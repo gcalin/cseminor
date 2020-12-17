@@ -96,6 +96,34 @@ def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separat
     res = [[np.float64(line[col]) for col in cols] for line in [re.split(separator, l.strip()) for l in lines]]
     return np.transpose(res) if column_major else res
 
+def read_slurm_file(filename, cols, skip=54, stop=-34, column_major=True):
+    """Reads real values from the columns from a file.
+
+    Args:
+        filename ([string]): The name of the file. 
+        cols ([int]): Which columns to select.
+        skip (int, optional): How many lines to skip in the beginning (if any). Defaults to 0.
+        stop (int, optional): At which line to stop (if any). -1 means to read till the end.
+        column_major (bool, optional): Wehteher to return the the values per column (True) or per line (False). Defaults to False.
+        separator (str, optional): The string which separates values on a line. Defaults to '[\t ]'.
+
+    Returns:
+        [[numpy.float64]]: A list of the read values.
+    """
+
+    # Set current directory
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    
+    # Open file
+    f = open(__location__ + '/' + filename, "r")
+
+    # Read lines and skip initial lines if necessary
+    lines = f.readlines()[skip:stop]
+
+    # Select columns
+    res = [[np.float64(line[col]) for col in cols] for line in [l.split() for l in lines]]
+    return np.transpose(res) if column_major else res
+
 def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, show_slope=True):
     """Plots multiple sets of values on a common grid.
 
@@ -141,7 +169,6 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
 
         # Generate a random (RGB) color. For common style, we should probably remove this in the future
         random_color = (random.random(), random.random(), random.random())
-        print(slopes)
 
         # Set up plot
         plt.title(title)
@@ -174,6 +201,20 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
 
 # TODO: remove global variable in the future
 paths = './../data/NaCl/'
+
+def plot_density():
+
+    # Particular filenames for diffusivity
+    filenames = paths + 'slurm-2588918.out'
+    #linearParts = [[20,40],[33,36]]#, [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
+    #self_diff = np.zeros((1, 2))
+    #file = filenames
+    #linearPart = linearParts[i]
+    # Read the lines and plot the results
+    lines = read_slurm_file(filenames, [0, 11])
+    print(np.mean(lines[:][1]))
+    self_diff=plot('Plot of Density ', 'Time', 'Density', lines[0], lines[1:], ['Density'], loglog=False, show_slope=False)
+    #return self_diff
 
 def plot_total_energy():
 
@@ -227,6 +268,7 @@ def plot_MS_diffusivity():
     MS_diff = plot('Plot of MS diffusivity ', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['water-water', 'water-NaCl', 'NaCl-NaCl'], linear=linearParts)
     return MS_diff
 
+plot_density()
 plot_total_energy()  
 
 self_diff = plot_diffusivity()
