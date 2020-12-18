@@ -96,7 +96,7 @@ def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separat
     res = [[np.float64(line[col]) for col in cols] for line in [re.split(separator, l.strip()) for l in lines]]
     return np.transpose(res) if column_major else res
 
-def read_slurm_file(filename, cols, skip=54, stop=-34, column_major=True):
+def read_slurm_file(filename, cols, skip=54, stop=-34, column_major=True, separator='[\t ]'):
     """Reads real values from the columns from a file.
 
     Args:
@@ -121,7 +121,7 @@ def read_slurm_file(filename, cols, skip=54, stop=-34, column_major=True):
     lines = f.readlines()[skip:stop]
 
     # Select columns
-    res = [[np.float64(line[col]) for col in cols] for line in [l.split() for l in lines]]
+    res = [[np.float64(line[col]) for col in cols] for line in [re.split(separator, l.strip()) for l in lines]]
     return np.transpose(res) if column_major else res
 
 def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, show_slope=True):
@@ -298,6 +298,7 @@ MS_diff = plot_MS_diffusivity()
 #print(MS_diff)
 if ((MS_diff != None)):
     MS_diff = mf_NaCl/mf_water*MS_diff[0] + mf_water/mf_NaCl*MS_diff[2]-2*MS_diff[1] #MS_diffusivity
+    MS_diff = MS_diff/N
 """   
 # calculate average and standard deviation
 avg_diff = np.average(self_diff, 0)
