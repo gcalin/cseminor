@@ -298,6 +298,7 @@ MS_diff = plot_MS_diffusivity()
 #print(MS_diff)
 if ((MS_diff != None)):
     MS_diff = mf_NaCl/mf_water*MS_diff[0] + mf_water/mf_NaCl*MS_diff[2]-2*MS_diff[1] #MS_diffusivity
+    MS_diff = MS_diff/N
 """   
 # calculate average and standard deviation
 avg_diff = np.average(self_diff, 0)
