@@ -264,7 +264,7 @@ def plot_MS_diffusivity():
     file = filenames
     #linearPart = linearParts[i]
     # Read the lines and plot the results
-    lines = read_file_lines(file, [0, 1, 2, 3], skip=3, column_major=True)
+    lines = read_file_lines(file, [0, 1, 2, 3], skip=2, column_major=True)
     MS_diff = plot('Plot of MS diffusivity ', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['water-water', 'water-NaCl', 'NaCl-NaCl'], linear=linearParts)
     return MS_diff
 

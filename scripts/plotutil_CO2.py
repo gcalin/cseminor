@@ -87,7 +87,7 @@ def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separat
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     
     # Open file
-    f = open(__location__ + '/' + filename, "r")
+    f = open(__location__ + "/" + filename, "r")
 
     # Read lines and skip initial lines if necessary
     lines = f.readlines()[skip:]
@@ -148,15 +148,15 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         plt.ylabel(ylabel)
 
         # Plot the values and the slope
-        if value[0]>0:
+        if loglog:
             plt.loglog(grid, value, c=random_color, label=label, marker='o')
             if show_slope:
                 plt.loglog(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
             
         else:
-            plt.loglog(grid, np.abs(value), c=random_color, label=label+'(negative)', marker='o')
+            plt.plot(grid, value, c=random_color, label=label, marker='o')
             if show_slope:
-                plt.loglog(grid, np.abs(slope*grid), '--', c=random_color, label = "slope of " + label)
+                plt.plot(grid, slope*grid, '--', c=random_color, label = "slope of " + label)
 
         plt.legend()        
         plt.show()
@@ -167,91 +167,99 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         return None
 
 # TODO: remove global variable in the future
-paths = './../data/NaCl/'
+paths = ['./../data/CO2/run7/']
 
 def plot_diffusivity():
 
     # Particular filenames for diffusivity
-    filenames = paths + 'selfdiffusivity.dat'
-    linearParts = [[20,40],[33,36]]#, [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
-    self_diff = np.zeros((1, 2))
-    file = filenames
-    #linearPart = linearParts[i]
-    # Read the lines and plot the results
-    lines = read_file_lines(file, [0, 1, 2], skip=3, column_major=True)
-    self_diff=plot('Plot of diffusivity ', 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['water', 'NaCl'], linear=linearParts)
+    filenames = [path + 'selfdiffusivity.dat' for path in paths]
+    linearParts = [None, None, None] #[[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
+    self_diff = np.zeros((len(filenames), 3))
+    for i in range(len(filenames)):
+        file = filenames[i]
+        linearPart = linearParts[i]
+        # Read the lines and plot the results
+        lines = read_file_lines(file, [0, 1, 2, 3], skip=3, column_major=True)
+        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['H2O', 'NaCl', 'CO2'], linear=linearPart)   
     return self_diff
 
 def plot_viscosity():
 
     # Particular filenames for viscosity
-    filenames = paths + 'viscosity.dat'
-    linearParts = [[19,59],[42,49]]#, [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
-    visc = np.zeros((1, 2))
-    file = filenames
-    #linearPart = linearParts[i]
-    # Read the lines and plot the results
-    lines = read_file_lines(file, [0, 8, 9], skip=3, column_major=True)
-    visc=plot('Plot of viscosity ', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearParts)
+    filenames = [path + 'viscosity.dat' for path in paths]
+    linearParts = [None, None] #[[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None]
+    visc = np.zeros((len(filenames), 2))
+    for i in range(len(filenames)):
+        file = filenames[i]
+        linearPart = linearParts[i]
+        # Read the lines and plot the results
+        lines = read_file_lines(file, [0, 8, 9], skip=3, column_major=True)
+        visc[i,:]=plot('Plot of viscosity '+str(i+1), 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearPart)
     return visc
 
-def plot_MS_diffusivity():
+def plot_onsager_coef():
 
-    # Particular filenames for MS diffusivity
-    filenames = paths + 'onsagercoefficient.dat'
-    linearParts = [[21,31],[13,29],[11,29]]#, [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
-    MS_diff = np.zeros((1, 3))
-    file = filenames
-    #linearPart = linearParts[i]
-    # Read the lines and plot the results
-    lines = read_file_lines(file, [0, 1, 2, 3], skip=3, column_major=True)
-    MS_diff = plot('Plot of MS diffusivity ', 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['water-water', 'water-NaCl', 'NaCl-NaCl'], linear=linearParts)
-    return MS_diff
+    # Particular filenames for diffusivity
+    filenames = [path + 'onsagercoefficient.dat' for path in paths]
+    linearParts = [None, None, None, None, None, None] #[[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None, None, None, None]
+    onsager_coef = np.zeros((len(filenames), 6))
+    for i in range(len(filenames)):
+        file = filenames[i]
+        linearPart = linearParts[i]
+        # Read the lines and plot the results
+        lines = read_file_lines(file, [0, 1, 2, 3, 4, 5, 6], skip=2, column_major=True)
+        lines = lines + abs(np.amin(lines))+1 # +1 to make surea ll values are >0, and not equal to 0.
+        onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 'Time', r'$MSD_{Onsager}$', lines[0], lines[1:], ['H2O-H2O', 'H2O-NaCl', 'H2O-CO2', 'NaCl-NaCl', 'NaCl-CO2', 'CO2-CO2'], linear=linearPart, loglog=True)   
+    return onsager_coef
 
-    
 #number of molecules
+N_water = 1000
+N_NaCl = 18
+N_CO2 = 6
+N = N_water + N_NaCl + N_CO2 #total number of molecules
+
 self_diff = plot_diffusivity()
-#print(self_diff)
-if (self_diff != None):
-    self_diff[0] = self_diff[0]/3000 #water
-    self_diff[1] = self_diff[1]/54 #NaCl
+for i in range(len(self_diff)):
+    if ((self_diff[i] !=  None).all()):
+        self_diff[i][0] = self_diff[i][0]/N_water #H2O
+        self_diff[i][1] = self_diff[i][1]/N_NaCl #NaCl
+        self_diff[i][2] = self_diff[i][2]/N_CO2 #CO2
 
 T=298.15 #temperature
 visc = plot_viscosity()
-#print(visc)
-if ((visc != None)):
-    visc[0]=visc[0]/T #shear viscosity
-    visc[1]=visc[1]/T #bulk viscosity
+for i in range(len(visc)):
+    if ((visc[i] != None).all()):
+        for j in range(len(visc[i])):
+            visc[i][j]=visc[i][j]/T
+# visc[i][0] is shear viscosity of run i, visc[i][1] is bulk voscosity of run i.
 
-N=3054 #number of molecules
-mf_water=3000/N # mole fraction
-mf_NaCl=54/N # mole fraction
-MS_diff = plot_MS_diffusivity()
-#print(MS_diff)
-if ((MS_diff != None)):
-    MS_diff = mf_NaCl/mf_water*MS_diff[0] + mf_water/mf_NaCl*MS_diff[2]-2*MS_diff[1] #MS_diffusivity
-"""   
+#mf_water = N_water/N # mole fraction
+#mf_NaCl = N_NaCl/N # mole fraction
+#mf_CO2 = N_CO2/N
+onsager_coef = plot_onsager_coef()
+for i in range(len(onsager_coef)):
+    if ((onsager_coef[i] != None).all()):
+        for j in range(len(onsager_coef[i])):
+            onsager_coef[i][j]=onsager_coef[i][j]/N
+'''
+for i in range(len(onsager_coef)):
+    if ((MS_diff != None)):
+        MS_diff = mf_NaCl/mf_water*onsager_coef[0] + mf_water/mf_NaCl*onsager_coef[2]-2*onsager_coef[1] #MS_diffusivity
+'''
+
+'''for calculating standard deviation when multiple runs are used.'''
 # calculate average and standard deviation
 avg_diff = np.average(self_diff, 0)
-avg_visc = np.average(visc, 0)
-
-std_diff = np.std(self_diff, 0)
-std_visc = np.std(visc, 0)
-# documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
-"""
-print("Self-diffusion constant of water:",self_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("Self-diffusion constant of NaCl:",self_diff[1],"angstrom^2/femtosecond = 10^-5 m^2/s." )
-
-print("Shear viscosity of the system:",visc[0],"atm*femtoseconds = 1.01325·10^−10 Pas.")
-print("Bulk viscosity of the system:",visc[1],"atm*femtoseconds = 1.01325·10^−10 Pas.")
-
-print("MS_Diffusivity of the system:",MS_diff,"angstrom^2/femtosecond = 10^-5 m^2/s.")
-
-"""
-print("Self-diffusion constant of water:%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0]))
+std_diff = np.std(self_diff, 0) # documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
+print("Self-diffusion constant of H2O:%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0]))
 print("Self-diffusion constant of NaCl:%10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[1], std_diff[1]))
+print("Self-diffusion constant of CO2:%10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[2], std_diff[2]))
 
+avg_visc = np.average(visc, 0)
+std_visc = np.std(visc, 0)
 print("Shear viscosity of the system:%10.3e +/-%10.3e atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0]))
 print("Bulk viscosity of the system:%10.3e +/-%10.3e atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1]))
-"""
+
+#print("MS_Diffusivity of the system:",MS_diff,"angstrom^2/femtosecond = 10^-5 m^2/s.")
+
 
