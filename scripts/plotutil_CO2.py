@@ -208,7 +208,7 @@ def plot_onsager_coef():
         linearPart = linearParts[i]
         # Read the lines and plot the results
         lines = read_file_lines(file, [0, 1, 2, 3, 4, 5, 6], skip=2, column_major=True)
-        lines = lines + abs(np.amin(lines))+1 # +1 to make surea ll values are >0, and not equal to 0.
+        lines = lines + abs(np.amin(lines))+1 # +1 to make sure all values are >0, and not equal to 0.
         onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 'Time', r'$MSD_{Onsager}$', lines[0], lines[1:], ['H2O-H2O', 'H2O-NaCl', 'H2O-CO2', 'NaCl-NaCl', 'NaCl-CO2', 'CO2-CO2'], linear=linearPart, loglog=True)   
     return onsager_coef
 
