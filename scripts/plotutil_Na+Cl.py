@@ -201,7 +201,7 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
     #    return None
 
 # TODO: remove global variable in the future
-paths = ['./../data/Na+Cl/']
+paths = ['./../data/Na+Cl//','./../data/Na+Cl//','./../data/Na+Cl//','./../data/Na+Cl//','./../data/Na+Cl//']
 
 def plot_density():
 
@@ -227,7 +227,7 @@ def plot_total_energy():
 def plot_diffusivity():
 
     filenames = [path + 'selfdiffusivity.dat' for path in paths]
-    linearParts = [[[14,36],[11,36]]]
+    linearParts = [[[14,36],[11,36]],[[14,36],[11,36]],[[14,36],[11,36]],[[14,36],[11,36]],[[14,36],[11,36]]]
     self_diff = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
         file = filenames[i]
@@ -240,7 +240,7 @@ def plot_diffusivity():
 def plot_viscosity():
 
     filenames = [path + 'viscosity.dat' for path in paths]
-    linearParts = [[[29,44],[29,39]]]
+    linearParts = [[[29,44],[29,39]],[[29,44],[29,39]],[[29,44],[29,39]],[[29,44],[29,39]],[[29,44],[29,39]]]
     visc = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
         file = filenames[i]
@@ -254,7 +254,7 @@ def plot_MS_diffusivity():
 
     # Particular filenames for MS diffusivity
     filenames = [path + 'onsagercoefficient.dat' for path in paths]
-    linearParts = [[14,36],[11,36],[15,36]]
+    linearParts = [[14,36],[11,36],[15,36], [14,36],[11,36],[15,36], [14,36],[11,36],[15,36], [14,36],[11,36],[15,36], [14,36],[11,36],[15,36]]
     MS_diff = np.zeros((len(filenames), 3))
     for i in range(len(filenames)):
         file = filenames[i]
@@ -279,7 +279,7 @@ e=2.837298 # Constant
 L=7.20198e-24*1.01325 # Length of the box (also including units adaptation)
 
 visc = plot_viscosity()
-print(visc)
+#print(visc)
 for i in range(len(visc)):
     if (visc != None).all():
         visc[i][0]=visc[i][0]/T #shear viscosity
@@ -287,7 +287,7 @@ for i in range(len(visc)):
 
 self_diff = plot_diffusivity()
 correct_self_diff=np.zeros((len(self_diff), 3))
-print(self_diff)
+#print(self_diff)
 for i in range(len(self_diff)):
     if (self_diff != None).all():
         self_diff[i][0] = self_diff[i][0]/N_water #water
@@ -298,7 +298,7 @@ for i in range(len(self_diff)):
         correct_self_diff[i][2] = self_diff[i][2] + (kb*T*e)/(6*np.pi*visc[i][0]*L)
 
 MS_diff = plot_MS_diffusivity()
-print(MS_diff)
+#print(MS_diff)
 for i in range(len(MS_diff)):
     if (MS_diff != None).all():
         MS_diff[i] = (N_NaCl/N_water*MS_diff[i][0] + N_water/N_NaCl*MS_diff[i][2]-2*MS_diff[i][1])/N #MS_diffusivity
@@ -313,7 +313,7 @@ std_visc = np.std(visc, 0)
 std_MS = np.std(MS_diff, 0)
 
 # documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
-
+'''
 print("Self-diffusion constant of water:",self_diff[0][0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
 print("Self-diffusion constant of NaCl:",self_diff[0][1],"angstrom^2/femtosecond = 10^-5 m^2/s." )
 print("Corrected self-diffusion constant of water:",correct_self_diff[0][0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
@@ -323,12 +323,18 @@ print("Shear viscosity of the system:",visc[0][0],"atm*femtoseconds = 1.01325·1
 print("Bulk viscosity of the system:",visc[0][1],"atm*femtoseconds = 1.01325·10^−10 Pas.")
 
 print("MS_Diffusivity of the system:",MS_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
-
-print(avg_diff)
-print(std_diff)
+'''
 print("Self-diffusion constant of water:", avg_diff[0], "+/-", std_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("Self-diffusion constant of NaCl:", avg_diff[1], "+/-", std_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Self-diffusion constant of Na:", avg_diff[1], "+/-", std_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Self-diffusion constant of Cl:", avg_diff[2], "+/-", std_diff[2], "angstrom^2/femtosecond = 10^-5 m^2/s.")
 
 print("Shear viscosity of the system:", avg_visc[0], "+/-", std_visc[0], "atm*femtoseconds = 1.01325·10^−10 Pas.")
 print("Bulk viscosity of the system:", avg_visc[1], "+/-", std_visc[1], "atm*femtoseconds = 1.01325·10^−10 Pas.")
+
+print("MS Diffusivity constant of water-water system:", avg_diff[0], "+/-", std_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of water-Na system:", avg_diff[1], "+/-", std_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of water-Cl system:", avg_diff[2], "+/-", std_diff[2], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of Na-Cl system:", avg_diff[3], "+/-", std_diff[3], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of Na-Na system:", avg_diff[4], "+/-", std_diff[4], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of Cl-Cl system:", avg_diff[5], "+/-", std_diff[5], "angstrom^2/femtosecond = 10^-5 m^2/s.")
 
