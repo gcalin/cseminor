@@ -278,7 +278,7 @@ e=2.837298 # Constant
 L=7.20198e-24*1.01325 # Length of the box (also including units adaptation)
 
 visc = plot_viscosity()
-print(visc)
+#print(visc)
 for i in range(len(visc)):
     if (visc != None).all():
         visc[i][0]=visc[i][0]/T #shear viscosity
@@ -286,7 +286,7 @@ for i in range(len(visc)):
 
 self_diff = plot_diffusivity()
 correct_self_diff=np.zeros((len(self_diff), 2))
-print(self_diff)
+#print(self_diff)
 for i in range(len(self_diff)):
     if (self_diff != None).all():
         self_diff[i][0] = self_diff[i][0]/N_water #water
@@ -295,7 +295,7 @@ for i in range(len(self_diff)):
         correct_self_diff[i][1] = self_diff[i][1] + (kb*T*e)/(6*np.pi*visc[i][0]*L)
 
 MS_diff = plot_MS_diffusivity()
-print(MS_diff)
+#print(MS_diff)
 for i in range(len(MS_diff)):
     if (MS_diff != None).all():
         MS_diff[i] = N_NaCl/N_water*MS_diff[i][0] + N_water/N_NaCl*MS_diff[i][2]-2*MS_diff[i][1] #MS_diffusivity
@@ -319,11 +319,10 @@ print("Bulk viscosity of the system:",visc[0][1],"atm*femtoseconds = 1.01325·10
 
 print("MS_Diffusivity of the system:",MS_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
 
-print(avg_diff)
-print(std_diff)
+
 print("Self-diffusion constant of water:", avg_diff[0], "+/-", std_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
 print("Self-diffusion constant of NaCl:", avg_diff[1], "+/-", std_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
 
 print("Shear viscosity of the system:", avg_visc[0], "+/-", std_visc[0], "atm*femtoseconds = 1.01325·10^−10 Pas.")
-print("Bulk viscosity of the system:", avg_visc[1], "+/-", std_visc[], "atm*femtoseconds = 1.01325·10^−10 Pas.")
+print("Bulk viscosity of the system:", avg_visc[1], "+/-", std_visc[1], "atm*femtoseconds = 1.01325·10^−10 Pas.")
 
