@@ -308,9 +308,14 @@ avg_diff = np.average(self_diff, 0)
 avg_visc = np.average(visc, 0)
 avg_MS = np.average(MS_diff,0)
 
+# Population standard deviation
 std_diff = np.std(self_diff, 0)
 std_visc = np.std(visc, 0)
 std_MS = np.std(MS_diff, 0)
+
+std_sample_diff = np.std(self_diff, 0, ddof=1)
+std_sample_visc = np.std(visc, 0, ddof=1)
+std_sample_MS = np.std(MS_diff, 0, ddof=1)
 
 # documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
 '''
@@ -324,17 +329,17 @@ print("Bulk viscosity of the system:",visc[0][1],"atm*femtoseconds = 1.01325·10
 
 print("MS_Diffusivity of the system:",MS_diff[0],"angstrom^2/femtosecond = 10^-5 m^2/s.")
 '''
-print("Self-diffusion constant of water:", avg_diff[0], "+/-", std_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("Self-diffusion constant of Na:", avg_diff[1], "+/-", std_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("Self-diffusion constant of Cl:", avg_diff[2], "+/-", std_diff[2], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Self-diffusion constant of water:", avg_diff[0], "+/-", std_sample_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Self-diffusion constant of Na:", avg_diff[1], "+/-", std_sample_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("Self-diffusion constant of Cl:", avg_diff[2], "+/-", std_sample_diff[2], "angstrom^2/femtosecond = 10^-5 m^2/s.")
 
-print("Shear viscosity of the system:", avg_visc[0], "+/-", std_visc[0], "atm*femtoseconds = 1.01325·10^−10 Pas.")
-print("Bulk viscosity of the system:", avg_visc[1], "+/-", std_visc[1], "atm*femtoseconds = 1.01325·10^−10 Pas.")
+print("Shear viscosity of the system:", avg_visc[0], "+/-", std_sample_visc[0], "atm*femtoseconds = 1.01325·10^−10 Pas.")
+print("Bulk viscosity of the system:", avg_visc[1], "+/-", std_sample_visc[1], "atm*femtoseconds = 1.01325·10^−10 Pas.")
 
-print("MS Diffusivity constant of water-water system:", avg_diff[0], "+/-", std_diff[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("MS Diffusivity constant of water-Na system:", avg_diff[1], "+/-", std_diff[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("MS Diffusivity constant of water-Cl system:", avg_diff[2], "+/-", std_diff[2], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("MS Diffusivity constant of Na-Cl system:", avg_diff[3], "+/-", std_diff[3], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("MS Diffusivity constant of Na-Na system:", avg_diff[4], "+/-", std_diff[4], "angstrom^2/femtosecond = 10^-5 m^2/s.")
-print("MS Diffusivity constant of Cl-Cl system:", avg_diff[5], "+/-", std_diff[5], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of water-water system:", avg_MS[0], "+/-", std_sample_MS[0], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of water-Na system:", avg_MS[1], "+/-", std_sample_MS[1], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of water-Cl system:", avg_MS[2], "+/-", std_sample_MS[2], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of Na-Cl system:", avg_MS[3], "+/-", std_sample_MS[3], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of Na-Na system:", avg_MS[4], "+/-", std_sample_MS[4], "angstrom^2/femtosecond = 10^-5 m^2/s.")
+print("MS Diffusivity constant of Cl-Cl system:", avg_MS[5], "+/-", std_sample_MS[5], "angstrom^2/femtosecond = 10^-5 m^2/s.")
 
