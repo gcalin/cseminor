@@ -257,18 +257,24 @@ MS_diff = np.zeros((len(onsager_coef), 3))
 for i in range(len(onsager_coef)): #loop over all runs
     if ((onsager_coef[i] != None).all()):
         # for every run calculate the 3 MS diffusion coefficients.
-        B11 = (1-x1)*(onsager_coef[i][0]/x1-onsager_coef[i][2]/x3) - \
+        Delta11 = (1-x1)*(onsager_coef[i][0]/x1-onsager_coef[i][2]/x3) - \
             x1*(onsager_coef[i][1]/x1-onsager_coef[i][4]/x3 + \
                 onsager_coef[i][2]/x1-onsager_coef[i][5]/x3)
-        B12 = (1-x2)*(onsager_coef[i][1]/x1-onsager_coef[i][4]/x3) - \
-            x2*(onsager_coef[i][0]/x1-onsager_coef[i][2]/x3 + \
-                onsager_coef[i][2]/x1-onsager_coef[i][5]/x3)
-        B21 = (1-x1)*(onsager_coef[i][1]/x2-onsager_coef[i][2]/x3) - \
+        Delta12 = (1-x1)*(onsager_coef[i][1]/x2-onsager_coef[i][2]/x3) - \
             x1*(onsager_coef[i][3]/x2-onsager_coef[i][4]/x3 + \
                 onsager_coef[i][4]/x2-onsager_coef[i][5]/x3)
-        B22 = (1-x2)*(onsager_coef[i][3]/x2-onsager_coef[i][4]/x3) - \
+        Delta21 = (1-x2)*(onsager_coef[i][1]/x1-onsager_coef[i][4]/x3) - \
+            x2*(onsager_coef[i][0]/x1-onsager_coef[i][2]/x3 + \
+                onsager_coef[i][2]/x1-onsager_coef[i][5]/x3)
+        Delta22 = (1-x2)*(onsager_coef[i][3]/x2-onsager_coef[i][4]/x3) - \
             x2*(onsager_coef[i][1]/x2-onsager_coef[i][2]/x3 + \
                 onsager_coef[i][4]/x2-onsager_coef[i][5]/x3)
+        Delta = np.array([[Delta11, Delta12], [Delta21, Delta22]])
+        B = np.linalg.inv(Delta)    # B = Delta^-1
+        B11 = B[0,0]
+        B12 = B[0,1]
+        B21 = B[1,0]
+        B22 = B[1,1]
         MS_diff[i][0] = 1/(B11-(x1+x3)/x1*B12) # D12
         MS_diff[i][1] = 1/(B11+(x2/x1)*B12)    # D13
         MS_diff[i][2] = 1/(B22+(x1/x2)*B21)    # D23
