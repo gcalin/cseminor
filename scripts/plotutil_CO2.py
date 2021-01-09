@@ -256,19 +256,25 @@ MS_diff = np.zeros((len(onsager_coef), 3))
 # TODO: check formulas below and possibly rewrite them.
 for i in range(len(onsager_coef)): #loop over all runs
     if ((onsager_coef[i] != None).all()):
+        Lambda11 = onsager_coef[i][0] # MSD_Water_Water
+        Lambda12 = onsager_coef[i][1] # MSD_Water_NaCl
+        Lambda13 = onsager_coef[i][2] # MSD_Water_CO2
+        Lambda22 = onsager_coef[i][3] # MSD_NaCl_NaCl
+        Lambda23 = onsager_coef[i][4] # MSD_NaCl_CO2
+        Lambda33 = onsager_coef[i][5] # MSD_CO2_CO2
         # for every run calculate the 3 MS diffusion coefficients.
-        Delta11 = (1-x1)*(onsager_coef[i][0]/x1-onsager_coef[i][2]/x3) - \
-            x1*(onsager_coef[i][1]/x1-onsager_coef[i][4]/x3 + \
-                onsager_coef[i][2]/x1-onsager_coef[i][5]/x3)
-        Delta12 = (1-x1)*(onsager_coef[i][1]/x2-onsager_coef[i][2]/x3) - \
-            x1*(onsager_coef[i][3]/x2-onsager_coef[i][4]/x3 + \
-                onsager_coef[i][4]/x2-onsager_coef[i][5]/x3)
-        Delta21 = (1-x2)*(onsager_coef[i][1]/x1-onsager_coef[i][4]/x3) - \
-            x2*(onsager_coef[i][0]/x1-onsager_coef[i][2]/x3 + \
-                onsager_coef[i][2]/x1-onsager_coef[i][5]/x3)
-        Delta22 = (1-x2)*(onsager_coef[i][3]/x2-onsager_coef[i][4]/x3) - \
-            x2*(onsager_coef[i][1]/x2-onsager_coef[i][2]/x3 + \
-                onsager_coef[i][4]/x2-onsager_coef[i][5]/x3)
+        Delta11 = (1-x1)*(Lambda11/x1-Lambda13/x3) - \
+                      x1*(Lambda12/x1-Lambda23/x3 + \
+                          Lambda13/x1-Lambda33/x3)
+        Delta12 = (1-x1)*(Lambda12/x2-Lambda13/x3) - \
+                      x1*(Lambda22/x2-Lambda23/x3 + \
+                          Lambda23/x2-Lambda33/x3)
+        Delta21 = (1-x2)*(Lambda12/x1-Lambda23/x3) - \
+                      x2*(Lambda11/x1-Lambda13/x3 + \
+                          Lambda13/x1-Lambda33/x3)
+        Delta22 = (1-x2)*(Lambda22/x2-Lambda23/x3) - \
+                      x2*(Lambda12/x2-Lambda13/x3 + \
+                          Lambda23/x2-Lambda33/x3)
         Delta = np.array([[Delta11, Delta12], [Delta21, Delta22]])
         B = np.linalg.inv(Delta)    # B = Delta^-1
         B11 = B[0,0]
