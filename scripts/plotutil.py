@@ -243,11 +243,11 @@ std_diff = np.std(self_diff, 0)
 std_visc = np.std(visc, 0)
 # documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
 
-print("Self-diffusion constant of Hydrogen:%10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0]))
-print("Self-diffusion constant of Oxygen:%10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[1], std_diff[1]))
+print("Self-diffusion constant of Hydrogen:%10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0], std_diff[0]/avg_diff[0]*100))
+print("Self-diffusion constant of Oxygen:%10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[1], std_diff[1], std_diff[1]/avg_diff[1]*100))
 
-print("Shear viscosity of water:%10.3e +/-%10.3e atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0]))
-print("Bulk viscosity of water:%10.3e +/-%10.3e atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1]))
+print("Shear viscosity of water:%10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0],std_visc[0]/avg_visc[0]*100))
+print("Bulk viscosity of water:%10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1],std_visc[1]/avg_visc[1]*100))
 
 plot_rdf()
 
