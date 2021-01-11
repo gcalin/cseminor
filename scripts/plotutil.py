@@ -167,7 +167,7 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         return None
 
 # TODO: remove global variable in the future
-paths = ['./../data/H2O/run1/', './../data/H2O/run2/', './../data/H2O/run3/', './../data/H2O/run5/']
+paths = ['./../data/H2O/run1/', './../data/H2O/run2/', './../data/H2O/run3/', './../data/H2O/run4/', './../data/H2O/run5/']
 '''
 def plot_diffusivity():
 
@@ -188,21 +188,24 @@ def plot_diffusivity():
 
     # Particular filenames for diffusivity
     filenames = [path + 'selfdiffusivity.dat' for path in paths]
-    linearParts = [[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
+    linearParts = [[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[14,27],[12,27]], [[11,41],[11,41]]] #[None, None, None]
     self_diff = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
         file = filenames[i]
         linearPart = linearParts[i]
         # Read the lines and plot the results
-        lines = read_file_lines(file, [0, 1, 2], skip=3, column_major=True)
-        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['Hydrogen', 'Oxygen'], linear=linearPart)   
+        if (i < 3):
+            lines = read_file_lines(file, [0, 1, 2], skip=3, column_major=True)
+        else: # run 4 and 5 have their data in a differetn order.
+            lines = read_file_lines(file, [0, 2, 1], skip=3, column_major=True)
+        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['Hydrogen', 'Oxygen'], linear=linearPart) 
     return self_diff
 
 def plot_viscosity():
 
     # Particular filenames for viscosity
     filenames = [path + 'viscosity.dat' for path in paths]
-    linearParts = [[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
+    linearParts = [[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]], [[34,48],[30,39]], [[30,42],[27,49]]] #[None, None, None]
     visc = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
         file = filenames[i]
