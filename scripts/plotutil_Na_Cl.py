@@ -39,7 +39,7 @@ def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separat
 
     # Read lines and skip initial lines if necessary
     lines = f.readlines()[skip:stop]
-    
+
     # Select columns
     res = [[np.float64(line[col]) for col in cols] for line in [re.split(separator, l.strip()) for l in lines]]
     return np.transpose(res) if column_major else res

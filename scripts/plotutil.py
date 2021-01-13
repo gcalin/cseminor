@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import linregress
 import re
 
-def compute_averaged_values(filenames, cols, skip=0, stop=-1, column_major=False, separator='[\t ]'):
+def compute_averaged_values(filenames, cols, skip=0, stop=-1, column_major=False, separator='[\t ]+'):
     """Computes the average values of multiple simulations.
 
     Args:
@@ -14,7 +14,7 @@ def compute_averaged_values(filenames, cols, skip=0, stop=-1, column_major=False
         skip (int, optional): How many lines to skip in the beginning (if any). Defaults to 0.
         stop (int, optional): At which line to stop (if any). -1 means to read till the end.
         column_major (bool, optional): Wehteher to return the the values per column (True) or per line (False). Defaults to False.
-        separator (str, optional): The string which separates values on a line. Defaults to '[\t ]'.
+        separator (str, optional): The string which separates values on a line. Defaults to '[\t ]+'.
 
     Returns:
         [type]: A set of columns with the value of each entry equal to the average of the the entries in each file.
@@ -90,7 +90,7 @@ def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separat
     f = open(__location__ + '/' + filename, "r")
 
     # Read lines and skip initial lines if necessary
-    lines = f.readlines()[skip:]
+    lines = f.readlines()[skip:stop]
 
     # Select columns
     res = [[np.float64(line[col]) for col in cols] for line in [re.split(separator, l.strip()) for l in lines]]
