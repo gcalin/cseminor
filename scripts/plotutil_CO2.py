@@ -126,7 +126,7 @@ def plot_density():
     for i in range(len(filenames)):
         file = filenames[i]
         lines = read_file_lines(file, [0, 11], skip=62, stop=113, column_major=True)
-        plot('Plot of Density '+str(i+1), 'Time', 'Density', lines[0], lines[1:], ['Density'], loglog=False, linear=None, show_slope=False)
+        plot('Plot of Density '+str(i+1), 'Timestep', 'Density (g/cm$^3$)', lines[0], lines[1:], ['Density'], loglog=False, linear=None, show_slope=False)
 
 def plot_total_energy():
 
@@ -136,7 +136,7 @@ def plot_total_energy():
     for i in range(len(filenames)):
         file = filenames[i]
         lines = read_file_lines(file, [0, 1], skip=2, column_major=True)
-        plot('Plot of Total Energy '+str(i+1), 'Time', 'Total Energy', lines[0], lines[1:], ['Total Energy'], loglog=False, linear=None, show_slope=False)
+        plot('Plot of Total Energy '+str(i+1), 'Timestep', 'Total Energy (Kcal/mol)', lines[0], lines[1:], ['Total Energy'], loglog=False, linear=None, show_slope=False)
 
 def plot_diffusivity():
 
@@ -149,7 +149,7 @@ def plot_diffusivity():
         linearPart = linearParts[i]
         # Read the lines and plot the results
         lines = read_file_lines(file, [0, 1, 2, 3], skip=3, column_major=True)
-        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['H2O', 'NaCl', 'CO2'], linear=linearPart)   
+        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Timestep', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['H2O', 'NaCl', 'CO2'], linear=linearPart)   
     return self_diff
 
 def plot_viscosity():
@@ -163,7 +163,7 @@ def plot_viscosity():
         linearPart = linearParts[i]
         # Read the lines and plot the results
         lines = read_file_lines(file, [0, 8, 9], skip=3, column_major=True)
-        visc[i,:]=plot('Plot of viscosity '+str(i+1), 'Time', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearPart)
+        visc[i,:]=plot('Plot of viscosity '+str(i+1), 'Timestep', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearPart)
     return visc
 
 def plot_onsager_coef():
@@ -178,7 +178,7 @@ def plot_onsager_coef():
         # Read the lines and plot the results
         lines = read_file_lines(file, [0, 1, 2, 3, 4, 5, 6], skip=2, column_major=True)
         lines = lines + abs(np.amin(lines))+1 # +1 to make sure all values are >0, and not equal to 0.
-        onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 'Time', r'$MSD_{Onsager}$', lines[0], lines[1:], ['H2O-H2O', 'H2O-NaCl', 'H2O-CO2', 'NaCl-NaCl', 'NaCl-CO2', 'CO2-CO2'], linear=linearPart, loglog=True)   
+        onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 'Timestep', r'$MSD_{Onsager}$', lines[0], lines[1:], ['H2O-H2O', 'H2O-NaCl', 'H2O-CO2', 'NaCl-NaCl', 'NaCl-CO2', 'CO2-CO2'], linear=linearPart, loglog=True)   
     return onsager_coef
 
 plot_density()
