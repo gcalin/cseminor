@@ -116,17 +116,18 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         return None
 
 # TODO: remove global variable in the future
-paths = ['./../data/CO2/run7/']
+paths = ['./../data/CO2/Restart1/']
 
 def plot_density():
 
     # Particular filenames for density
-    filenames = [path + 'slurm-2590471.out' for path in paths]
+    filenames = [path + 'slurm-1789.out' for path in paths]
     # Read the lines and plot the results
     for i in range(len(filenames)):
         file = filenames[i]
-        lines = read_file_lines(file, [0, 11], skip=62, stop=113, column_major=True)
+        lines = read_file_lines(file, [0, 11], skip=81, stop=132, column_major=True)
         plot('Plot of Density '+str(i+1), 'Timestep', 'Density (g/cm$^3$)', lines[0], lines[1:], ['Density'], loglog=False, linear=None, show_slope=False)
+        print("Average density: %10.3e g/cm^3." %(np.mean(lines[1])))
 
 def plot_total_energy():
 
@@ -142,35 +143,35 @@ def plot_diffusivity():
 
     # Particular filenames for diffusivity
     filenames = [path + 'selfdiffusivity.dat' for path in paths]
-    linearParts = [None, None, None] #[[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
+    linearParts = [[[5,-1], [10,-2], [6,19]]] #[None, None, None]
     self_diff = np.zeros((len(filenames), 3))
     for i in range(len(filenames)):
         file = filenames[i]
         linearPart = linearParts[i]
         # Read the lines and plot the results
         lines = read_file_lines(file, [0, 1, 2, 3], skip=3, column_major=True)
-        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Timestep', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['H2O', 'NaCl', 'CO2'], linear=linearPart)   
+        self_diff[i,:]=plot('Plot of diffusivity '+str(i+1), 'Time (fs)', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['H2O', 'NaCl', 'CO2'], linear=linearPart)   
     return self_diff
 
 def plot_viscosity():
 
     # Particular filenames for viscosity
     filenames = [path + 'viscosity.dat' for path in paths]
-    linearParts = [None, None] #[[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None]
+    linearParts = [[[13,36], [30,37]]] #[[[29,44],[29,39]], [[30,49],[31,40]], [[30,42],[27,49]], [[30,42],[27,49]]] #[None, None, None]
     visc = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
         file = filenames[i]
         linearPart = linearParts[i]
         # Read the lines and plot the results
         lines = read_file_lines(file, [0, 8, 9], skip=3, column_major=True)
-        visc[i,:]=plot('Plot of viscosity '+str(i+1), 'Timestep', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearPart)
+        visc[i,:]=plot('Plot of viscosity '+str(i+1), 'Time (fs)', r'$MSD_{Viscosity}$', lines[0], lines[1:], ['MSD_all', 'MSD_bulkvisc'], linear=linearPart)
     return visc
 
 def plot_onsager_coef():
 
     # Particular filenames for diffusivity
     filenames = [path + 'onsagercoefficient.dat' for path in paths]
-    linearParts = [None, None, None, None, None, None] #[[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None, None, None, None]
+    linearParts = [[[9,18],[0,-1],[0,-1],[1,19],[0,-1],[3,18]]] #[[[14,36],[11,36]], [[15,36],[13,36]], [[18,36],[14,36]], [[7,41],[9,41]]] #[None, None, None]
     onsager_coef = np.zeros((len(filenames), 6))
     for i in range(len(filenames)):
         file = filenames[i]
@@ -178,16 +179,16 @@ def plot_onsager_coef():
         # Read the lines and plot the results
         lines = read_file_lines(file, [0, 1, 2, 3, 4, 5, 6], skip=2, column_major=True)
         lines = lines + abs(np.amin(lines))+1 # +1 to make sure all values are >0, and not equal to 0.
-        onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 'Timestep', r'$MSD_{Onsager}$', lines[0], lines[1:], ['H2O-H2O', 'H2O-NaCl', 'H2O-CO2', 'NaCl-NaCl', 'NaCl-CO2', 'CO2-CO2'], linear=linearPart, loglog=True)   
+        onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 'Time (fs)', r'$MSD_{Onsager}$', lines[0], lines[1:], ['H2O-H2O', 'H2O-NaCl', 'H2O-CO2', 'NaCl-NaCl', 'NaCl-CO2', 'CO2-CO2'], linear=linearPart, loglog=True)   
     return onsager_coef
 
 plot_density()
 plot_total_energy()
 
 #number of molecules
-N_water = 1000
-N_NaCl = 18
-N_CO2 = 6
+N_water = 3000 #1000
+N_NaCl = 36 #18
+N_CO2 = 18 #6
 N = N_water + N_NaCl + N_CO2 #total number of molecules
 
 self_diff = plot_diffusivity()
