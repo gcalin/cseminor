@@ -206,6 +206,8 @@ for i in range(len(visc)):
             visc[i][j]=visc[i][j]/T
 # visc[i][0] is shear viscosity of run i, visc[i][1] is bulk voscosity of run i.
 
+'''
+#Calculation of MS diffusivity from onsager coefficients for ternary mixture.
 onsager_coef = plot_onsager_coef()
 for i in range(len(onsager_coef)):
     if ((onsager_coef[i] != None).all()):
@@ -252,6 +254,14 @@ for i in range(len(onsager_coef)): #loop over all runs
         MS_diff[i][0] = 1/(B11-(x1+x3)/x1*B12) # D12
         MS_diff[i][1] = 1/(B11+(x2/x1)*B12)    # D13
         MS_diff[i][2] = 1/(B22+(x1/x2)*B21)    # D23
+'''
+
+# Calculation of MS diffusivity form self diffusivities.
+# TODO: add MS diffusivity calculation using darken equation for quartenary mixtures.
+
+
+# TODO: add electrical conductivity calculation.
+
 
 '''for calculating standard deviation when multiple runs are used.'''
 # calculate average and standard deviation over the different runs
