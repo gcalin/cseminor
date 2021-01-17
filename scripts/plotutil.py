@@ -221,7 +221,7 @@ def plot_rdf():
     lines = compute_averaged_values(filenames, [0, 2, 4, 6], skip=1, column_major=True)
     plot('Plot of radial distribution function (rdf)', 'Radius', r'Density', lines[0], lines[1:], ['Hydrogen-Hydrogen', 'Hydrogen-Oxygen', 'Oxygen-Oxygen'], show_slope=False)
     
-N=800 #number of molecules
+N=800 #number of atoms
 self_diff = plot_diffusivity()
 for i in range(len(self_diff)):
     if ((self_diff[i] !=  None).all()):
