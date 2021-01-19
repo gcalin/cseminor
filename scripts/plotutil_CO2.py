@@ -129,6 +129,8 @@ def plot_density():
         plot('Plot of Density '+str(i+1), 'Timestep', 'Density (g/cm$^3$)', lines[0], lines[1:], ['Density'], loglog=False, linear=None, show_slope=False)
         print("Average density: %10.3e g/cm^3." %(np.mean(lines[1])))
 
+# TODO: make density plot work for multiple runs
+
 def plot_total_energy():
 
     # Particular filenames for total energy
@@ -206,6 +208,8 @@ for i in range(len(visc)):
             visc[i][j]=visc[i][j]/T
 # visc[i][0] is shear viscosity of run i, visc[i][1] is bulk voscosity of run i.
 
+
+
 '''
 #Calculation of MS diffusivity from onsager coefficients for ternary mixture.
 onsager_coef = plot_onsager_coef()
@@ -215,7 +219,6 @@ for i in range(len(onsager_coef)):
             onsager_coef[i][j]=onsager_coef[i][j]/N
 
 ## MS diffusivity for termnary mixtures
-
 # molar fractions
 x1 = N_water/N 
 x2 = N_NaCl/N
@@ -256,8 +259,18 @@ for i in range(len(onsager_coef)): #loop over all runs
         MS_diff[i][2] = 1/(B22+(x1/x2)*B21)    # D23
 '''
 
+# molar fractions
+x1 = N_water/N 
+x2 = N_NaCl/N
+x3 = N_CO2/N
+
+MS_diff = np.zeros((len(self_diff), 3))
+Sum = x1/self_diff[:,0]+x2/self_diff[:,1]+x3/self_diff[:,2]
 # Calculation of MS diffusivity form self diffusivities.
-# TODO: add MS diffusivity calculation using darken equation for quartenary mixtures.
+for i in range(len(self_diff)):
+    MS_diff[i][0] = self_diff[i][0]*self_diff[i][1]*Sum[i]  # D12 (water,NaCl)
+    MS_diff[i][1] = self_diff[i][0]*self_diff[i][2]*Sum[i]  # D13 (water,CO2)
+    MS_diff[i][2] = self_diff[i][1]*self_diff[i][2]*Sum[i]  # D23 (NaCl, CO2)
 
 
 # TODO: add electrical conductivity calculation.
