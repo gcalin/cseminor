@@ -117,19 +117,18 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
 
 # TODO: remove global variable in the future
 paths = ['./../data/CO2/Restart1/']
+slurm = ['slurm-1789.out']
 
 def plot_density():
-
-    # Particular filenames for density
-    filenames = [path + 'slurm-1789.out' for path in paths]
+    density = np.zeros(len(paths))
     # Read the lines and plot the results
-    for i in range(len(filenames)):
-        file = filenames[i]
-        lines = read_file_lines(file, [0, 11], skip=81, stop=132, column_major=True)
+    data_lines = [[81,132]] #lines may be different per slurm file.
+    for i in range(len(paths)):
+        file = paths[i] + slurm[i]
+        lines = read_file_lines(file, [0, 11], skip=data_lines[i][0], stop=data_lines[i][1], column_major=True)
         plot('Plot of Density '+str(i+1), 'Timestep', 'Density (g/cm$^3$)', lines[0], lines[1:], ['Density'], loglog=False, linear=None, show_slope=False)
-        print("Average density: %10.3e g/cm^3." %(np.mean(lines[1])))
-
-# TODO: make density plot work for multiple runs
+        density[i]=np.mean(lines[1])
+    return density
 
 def plot_total_energy():
 
@@ -184,14 +183,28 @@ def plot_onsager_coef():
         onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 'Time (fs)', r'$MSD_{Onsager}$', lines[0], lines[1:], ['H2O-H2O', 'H2O-NaCl', 'H2O-CO2', 'NaCl-NaCl', 'NaCl-CO2', 'CO2-CO2'], linear=linearPart, loglog=True)   
     return onsager_coef
 
-plot_density()
+density = plot_density()
 plot_total_energy()
 
-#number of molecules
-N_water = 3000 #1000
-N_NaCl = 36 #18
-N_CO2 = 18 #6
-N = N_water + N_NaCl + N_CO2 #total number of molecules
+#number of atoms for 1m
+N_water = 3000 # = 1000 molecules
+N_NaCl  = 36   # = 18 molecules
+N_CO2   = 18   # = 6 molecules
+N = N_water + N_NaCl + N_CO2 #total number of atoms
+m_water = (2*1.00794+15.9994)/3  #avg mass of an atom in water
+m_NaCl  = (22.9898+35.4530)/2    #avg mass of an atom in NaCl
+m_CO2   = (12.0107+2*15.9994)/3  #avg mass on an atom in CO1
+N_avogadro = 6.02214076e23 
+m = (N_water*m_water + N_NaCl*m_NaCl + N_CO2*m_CO2)/N_avogadro
+T = 298.15 #temperature
+kB = 1.38064852e-23 #m^2 kg s^-2 K^-1
+V = m/density * 10**-6 #m^3
+L = V**(1/3) #m
+xi = 2.837298 #for periodic (cubic) lattices
+e = 1.60217662e-19 #Coulomb 
+q_Na = 1
+q_Cl = -1
+#TODO: check units of variables above.
 
 self_diff = plot_diffusivity()
 for i in range(len(self_diff)):
@@ -200,7 +213,6 @@ for i in range(len(self_diff)):
         self_diff[i][1] = self_diff[i][1]/N_NaCl #NaCl
         self_diff[i][2] = self_diff[i][2]/N_CO2 #CO2
 
-T=298.15 #temperature
 visc = plot_viscosity()
 for i in range(len(visc)):
     if ((visc[i] != None).all()):
@@ -208,7 +220,9 @@ for i in range(len(visc)):
             visc[i][j]=visc[i][j]/T
 # visc[i][0] is shear viscosity of run i, visc[i][1] is bulk voscosity of run i.
 
-
+# Self diffusivity correction
+for i in range(len(self_diff[0])):
+    self_diff[:,i] += kB*T*xi/(6*np.pi*(visc[:,0]*1.01325e-10)*L) * 1e5
 
 '''
 #Calculation of MS diffusivity from onsager coefficients for ternary mixture.
@@ -272,12 +286,18 @@ for i in range(len(self_diff)):
     MS_diff[i][1] = self_diff[i][0]*self_diff[i][2]*Sum[i]  # D13 (water,CO2)
     MS_diff[i][2] = self_diff[i][1]*self_diff[i][2]*Sum[i]  # D23 (NaCl, CO2)
 
+# Ionic conductivity calculation.
+ion_cond = (e*e/(kB*T*V))*(1/2*N_NaCl*(q_Na)**2*self_diff[:,1] + 1/2*N_NaCl*(q_Cl)**2*self_diff[:,1])*10**-5 # Siemens/m
 
-# TODO: add electrical conductivity calculation.
-
+## TODO: find out what units to use. Is V the volume? How do we find that, take the average?
+## TODO: implement this for quarternary mixture.
 
 '''for calculating standard deviation when multiple runs are used.'''
 # calculate average and standard deviation over the different runs
+avg_dens = np.average(density, 0)
+std_dens = np.std(density, 0)
+print("Average density: %10.3e +/-%10.3e g/cm^3." %(avg_dens, std_dens))
+
 avg_diff = np.average(self_diff, 0)
 std_diff = np.std(self_diff, 0)
 print("Self-diffusion constant of H2O: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0]))
@@ -294,6 +314,8 @@ std_MSdiff = np.std(MS_diff, 0)
 print("MS diffusivity of Water and NaCl: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[0],std_MSdiff[0]))
 print("MS diffusivity of Water and CO2: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[1],std_MSdiff[1]))
 print("MS diffusivity of NaCl and CO2: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[2],std_MSdiff[2]))
-# TODO: check units MS diffusivity.
 
+avg_cond = np.average(ion_cond, 0)
+std_cond = np.std(ion_cond, 0)
+print("Electric conductivity: %10.3e +/-%10.3e S/m." %(avg_cond, std_cond))
 
