@@ -68,7 +68,7 @@ def compute_errors_per_column(filenames, cols, skip=0, stop=-1, column_major=Tru
     # Return the error at each time step across all columns
     return [[np.std(valtuple)*100/np.average(valtuple) for valtuple in col] for col in res]
 
-def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separator='[\t ]'):
+def read_file_lines(filename, cols, skip=0, stop=-1, column_major=False, separator='[\t ]+'):
     """Reads real values from the columns from a file.
 
     Args:
@@ -168,22 +168,29 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
 
 # TODO: remove global variable in the future
 paths = ['./../data/H2O/run1/', './../data/H2O/run2/', './../data/H2O/run3/', './../data/H2O/run4/', './../data/H2O/run5/']
-'''
-def plot_diffusivity():
+slurm = ['slurm-2585572.out', 'slurm-2586424.out', 'slurm-2586498.out', 'slurm-2586501.out', 'slurm-2586508.out']
 
-    # Particular filenames for diffusivity
-    filenames = [path + 'selfdiffusivity.dat' for path in paths]
-    #lines = read_file_lines('./../data/H2O/run1/selfdiffusivity.dat', [0, 1, 2], skip=3, column_major=True)
-
+def plot_density():
+    density = np.zeros(len(paths))
     # Read the lines and plot the results
-    lines = compute_averaged_values(filenames, [0,1,2], skip=3, column_major=True)
-    self_diff = plot('Plot of diffusivity', 'Time', r'$MSD_{Diffusivity}$', lines[0], lines[1:], ['Hydrogen', 'Oxygen'], linear=[[15,len(lines[0])], [11,len(lines[0])]])
-    
-    # Get the array of errors at each point and plot
-    err = compute_errors_per_column(filenames, [1,2], skip=3, column_major=True)
-    plot('Errors in diffusivity', 'Time', r'100*stddev/mean', np.log10(lines[0]), err, ['Hydrogen', 'Oxygen'], loglog=False, linear=None, show_slope=False)
-    return self_diff
-'''
+    data_lines = [[685,786], [685,786], [685,786], [685,786], [51,552]] #lines may be different per slurm file.
+    for i in range(len(paths)):
+        file = paths[i] + slurm[i]
+        lines = read_file_lines(file, [0, 11], skip=data_lines[i][0], stop=data_lines[i][1], column_major=True)
+        #plot('Plot of Density '+str(i+1), 'Timestep', 'Density (g/cm$^3$)', lines[0], lines[1:], ['Density'], loglog=False, linear=None, show_slope=False)
+        density[i]=np.mean(lines[1])
+    return density
+
+def plot_total_energy():
+
+    # Particular filenames for total energy
+    filenames = [path + 'TotalEnergy.dat' for path in paths]
+    # Read the lines and plot the results
+    for i in range(len(filenames)):
+        file = filenames[i]
+        lines = read_file_lines(file, [0, 1], skip=2, column_major=True)
+        plot('Plot of Total Energy '+str(i+1), 'Timestep', 'Total Energy (Kcal/mol)', lines[0], lines[1:], ['Total Energy'], loglog=False, linear=None, show_slope=False)
+
 def plot_diffusivity():
 
     # Particular filenames for diffusivity
@@ -221,7 +228,10 @@ def plot_rdf():
     lines = compute_averaged_values(filenames, [0, 2, 4, 6], skip=1, column_major=True)
     plot('Plot of radial distribution function (rdf)', 'Radius', r'Density', lines[0], lines[1:], ['Hydrogen-Hydrogen', 'Hydrogen-Oxygen', 'Oxygen-Oxygen'], show_slope=False)
     
-N=800 #number of atoms
+density = plot_density() #uncomment print statement in function for density plots.
+#plot_total_energy() #uncomment for energy plots.
+
+N=800 #number of molecules
 self_diff = plot_diffusivity()
 for i in range(len(self_diff)):
     if ((self_diff[i] !=  None).all()):
@@ -234,20 +244,44 @@ for i in range(len(visc)):
     if ((visc[i] != None).all()):
         visc[i][0]=visc[i][0]/T #shear viscosity
         visc[i][1]=visc[i][1]/T #bulk viscosity
-    
-#calculate average and standard deviation
-avg_diff = np.average(self_diff, 0)
-avg_visc = np.average(visc, 0)
 
+kB = 1.38064852e-23 #m^2 kg s^-2 K^-1
+T = 298.15 #temperature in K
+xi = 2.837298 #for periodic (cubic) lattices
+m_water = (2*1.00794+15.9994)  #mass of a water molecule
+N_avogadro = 6.02214076e23 
+m = N*(m_water)/N_avogadro
+V = m/density * 10**-6 #m^3
+L = V**(1/3) #m
+
+# Self diffusivity correction
+for i in range(len(self_diff[0])):
+    self_diff[:,i] += kB*T*xi/(6*np.pi*(visc[:,0]*1.01325e-10)*L) * 1e5
+
+#calculate average and standard deviation
+avg_dens = np.average(density, 0)
+std_dens = np.std(density, 0)
+print("Average density: %10.3e +/-%10.3e (%3.2f%%) g/cm^3." %(avg_dens, std_dens, std_dens/avg_dens*100))
+
+avg_diff = np.average(self_diff, 0)
 std_diff = np.std(self_diff, 0)
-std_visc = np.std(visc, 0)
-# documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
 
 print("Self-diffusion constant of Hydrogen:%10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0], std_diff[0]/avg_diff[0]*100))
 print("Self-diffusion constant of Oxygen:%10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[1], std_diff[1], std_diff[1]/avg_diff[1]*100))
+
+avg_visc = np.average(visc, 0)
+std_visc = np.std(visc, 0)
+# documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
 
 print("Shear viscosity of water:%10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0],std_visc[0]/avg_visc[0]*100))
 print("Bulk viscosity of water:%10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1],std_visc[1]/avg_visc[1]*100))
 
 plot_rdf()
+
+print("\nFound vs expected results")
+print("Density =%10.3e vs%10.3e" %(avg_dens,0.99705))
+print("Viscosity =%10.3e vs%10.3e" %(avg_visc[0]*(1.01325e-10),890.08e-6))
+# data for comparison from NIST database
+
+
 

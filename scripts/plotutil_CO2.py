@@ -196,7 +196,7 @@ m_NaCl  = (22.9898+35.4530)/2    #avg mass of an atom in NaCl
 m_CO2   = (12.0107+2*15.9994)/3  #avg mass on an atom in CO1
 N_avogadro = 6.02214076e23 
 m = (N_water*m_water + N_NaCl*m_NaCl + N_CO2*m_CO2)/N_avogadro
-T = 298.15 #temperature
+T = 298.15 #temperature in K
 kB = 1.38064852e-23 #m^2 kg s^-2 K^-1
 V = m/density * 10**-6 #m^3
 L = V**(1/3) #m
@@ -296,26 +296,26 @@ ion_cond = (e*e/(kB*T*V))*(1/2*N_NaCl*(q_Na)**2*self_diff[:,1] + 1/2*N_NaCl*(q_C
 # calculate average and standard deviation over the different runs
 avg_dens = np.average(density, 0)
 std_dens = np.std(density, 0)
-print("Average density: %10.3e +/-%10.3e g/cm^3." %(avg_dens, std_dens))
+print("Average density: %10.3e +/-%10.3e (%3.2f%%) g/cm^3." %(avg_dens, std_dens, std_dens/avg_dens*100))
 
 avg_diff = np.average(self_diff, 0)
 std_diff = np.std(self_diff, 0)
-print("Self-diffusion constant of H2O: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0]))
-print("Self-diffusion constant of NaCl: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[1], std_diff[1]))
-print("Self-diffusion constant of CO2: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[2], std_diff[2]))
+print("Self-diffusion constant of H2O: %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0], std_diff[0]/avg_diff[0]*100))
+print("Self-diffusion constant of NaCl: %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[1], std_diff[1], std_diff[1]/avg_diff[1]*100))
+print("Self-diffusion constant of CO2: %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[2], std_diff[2], std_diff[2]/avg_diff[2]*100))
 
 avg_visc = np.average(visc, 0)
 std_visc = np.std(visc, 0)
-print("Shear viscosity of the system: %10.3e +/-%10.3e atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0]))
-print("Bulk viscosity of the system: %10.3e +/-%10.3e atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1]))
+print("Shear viscosity of the system: %10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0],std_visc[0]/avg_visc[0]*100))
+print("Bulk viscosity of the system: %10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1],std_visc[1]/avg_visc[1]*100))
 
 avg_MSdiff = np.average(MS_diff, 0)
 std_MSdiff = np.std(MS_diff, 0)
-print("MS diffusivity of Water and NaCl: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[0],std_MSdiff[0]))
-print("MS diffusivity of Water and CO2: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[1],std_MSdiff[1]))
-print("MS diffusivity of NaCl and CO2: %10.3e +/-%10.3e angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[2],std_MSdiff[2]))
+print("MS diffusivity of Water and NaCl: %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[0],std_MSdiff[0],std_MSdiff[0]/avg_MSdiff[0]*100))
+print("MS diffusivity of Water and CO2: %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[1],std_MSdiff[1],std_MSdiff[1]/avg_MSdiff[1]*100))
+print("MS diffusivity of NaCl and CO2: %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[2],std_MSdiff[2],std_MSdiff[2]/avg_MSdiff[2]*100))
 
 avg_cond = np.average(ion_cond, 0)
 std_cond = np.std(ion_cond, 0)
-print("Electric conductivity: %10.3e +/-%10.3e S/m." %(avg_cond, std_cond))
+print("Electric conductivity: %10.3e +/-%10.3e (%3.2f%%) S/m." %(avg_cond, std_cond, std_cond/avg_cond*100))
 
