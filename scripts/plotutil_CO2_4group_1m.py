@@ -322,23 +322,26 @@ ion_cond = (e*e/(kB*T*V))*(1/2*N_Na*(q_Na)**2*self_diff[:,3] + 1/2*N_Cl*(q_Cl)**
 # calculate average and standard deviation over the different runs
 avg_dens = np.average(density, 0)
 std_dens = np.std(density, 0)
-print("Average density: %10.3e +/-%10.3e (%3.2f%%) g/cm^3." %(avg_dens, std_dens, std_dens/avg_dens*100))
+print("Average density: %10.3e +/-%10.3e (%3.2f%%) g/cm^3.\n" %(avg_dens, std_dens, std_dens/avg_dens*100))
 
 avg_diff = np.average(self_diff, 0)
 std_diff = np.std(self_diff, 0)
 diff_order = ["H2O", "Cl", "CO2", "Na"]
 for i in range(len(avg_diff)):
     print("Self-diffusion constant of "+diff_order[i]+": %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[i], std_diff[i], std_diff[i]/avg_diff[i]*100))
+print("\n")
 
 avg_visc = np.average(visc, 0)
 std_visc = np.std(visc, 0)
 print("Shear viscosity of the system: %10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0],std_visc[0]/avg_visc[0]*100))
-print("Bulk viscosity of the system: %10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1],std_visc[1]/avg_visc[1]*100))
+print("Bulk viscosity of the system: %10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas.\n" %(avg_visc[1],std_visc[1],std_visc[1]/avg_visc[1]*100))
 
 avg_MSdiff = np.average(MS_diff, 0)
 std_MSdiff = np.std(MS_diff, 0)
 MSdiff_order = [["H2O","Cl"], ["H2O", "CO2"], ["H2O", "Na"], ["Cl", "CO2"], ["Cl", "Na"], ["CO2", "Na"]]
-print("MS diffusivity of "+MSdiff_order[i][0]+" and "+MSdiff_order[i][1]+": %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[i],std_MSdiff[i],std_MSdiff[i]/avg_MSdiff[i]*100))
+for i in range(len(avg_MSdiff)):
+    print("MS diffusivity of "+MSdiff_order[i][0]+" and "+MSdiff_order[i][1]+": %10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_MSdiff[i],std_MSdiff[i],std_MSdiff[i]/avg_MSdiff[i]*100))
+print("\n")
 
 avg_cond = np.average(ion_cond, 0)
 std_cond = np.std(ion_cond, 0)
