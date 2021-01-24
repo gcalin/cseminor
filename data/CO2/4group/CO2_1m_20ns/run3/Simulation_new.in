@@ -1,0 +1,129 @@
+#################### INITIALIZATION ####################
+units real
+dimension 3
+newton on
+boundary p p p
+atom_style full
+
+#################### VARIABLES ####################
+
+variable Temp equal 393.15         # Temperature in K
+variable Pres equal 49.3462        # Pressure in atm.
+variable RandomSeed equal 09746    # The random seed for velocity
+variable tstep equal 2.0           # 2fs 
+#variable nininpt equal 2000        # Sample equilibration in the NPT ensemble
+variable nrun equal  20000000       # production 10 ns
+variable Nf equal 100000           # The total nr. of steps of sampling for an average
+variable Ne equal 10               # Sample every 50 cycles
+variable Nr equal ${Nf}/${Ne}      # The number of samples
+variable Nvis equal  5             # sampling rate of viscosity every (Nvis*2) timestep
+variable Ntherm equal 5            # sampling rate of viscosity every (Nvis*2) timestep
+variable Ndiff equal 1000          # sampling rate of diffusion every Ndif timestep
+variable Nwrite equal 10000        # writing to file every Nwrite
+variable nrestart equal ${nrun}/2  # how often to print restart file, currently 5ns
+
+variable N_thermo equal ${Nf}      # show results every Nf timesteps    
+variable Ndump equal 500000        # Make movie with 10 snapshots
+
+#################### ATOM DEFINITION and FORCEFIELD ####################
+
+# Read restart file
+read_restart ./NPT.restart.5000000             # read the positions
+include forcefield_fix2.data                   # read the force field
+
+#################### SETTINGS ####################
+
+group water type 3 4                       # Water
+group Na    type 1                         # Na ions
+group Cl    type 2			   # Cl ions
+group COO   type 5 6			   # CO2
+
+neighbor 2.0 bin
+neigh_modify every 1 delay 0 check yes
+
+reset_timestep 0
+run_style verlet
+
+#################### FIXES/Initialization of the system ####################
+
+fix constrain water shake 1.0e-6 1000 0 b 1 a 1
+#fix integrate all npt temp ${Temp} ${Temp} 10.0 iso ${Pres} ${Pres} 100.0
+
+velocity all create ${Temp} ${RandomSeed}  
+
+#thermo ${N_thermo}
+
+# Just to minimize the whole system correctly
+#timestep 0.0001
+#run 10000 
+#timestep 0.0002
+#run 10000 
+#timestep 0.0005
+#run 10000 
+#timestep 0.001
+#run 10000 
+#timestep 0.002
+#run 10000 
+#timestep 0.005
+#run 10000 
+#timestep 0.01
+#run 10000 
+#timestep 0.02
+#run 10000 
+#timestep 0.05
+#run 10000 
+#timestep 0.1
+#run 10000 
+#timestep 0.2
+#run 10000 
+#timestep 0.5
+#run 10000 
+#timestep ${tstep}
+#run 10000
+#
+#unfix integrate
+#fix integrate all npt temp ${Temp} ${Temp} 100.0 iso ${Pres} ${Pres} 1000.0
+#
+#run ${nininpt}
+
+#################### 2) PRODUCTION in NPT #####################
+
+#reset_timestep 0
+fix integrate all npt temp ${Temp} ${Temp} 100.0 iso ${Pres} ${Pres} 1000.0
+
+variable TotEn equal etotal
+fix TEAve all ave/time ${Ne} ${Nr} ${Nf} v_TotEn file TotalEnergy.dat
+
+variable PotEn equal pe
+fix PEAve all ave/time ${Ne} ${Nr} ${Nf} v_PotEn file PotentialEnergy.dat
+
+variable KinEn equal ke
+fix KEAve all ave/time ${Ne} ${Nr} ${Nf} v_KinEn file KineticEnergy.dat
+
+compute T all temp
+fix TempAve all ave/time ${Ne} ${Nr} ${Nf} c_T file Temperature.dat
+
+## computing viscosity and average pressure
+compute P all pressure T
+fix PressAve all ave/time ${Ne} ${Nr} ${Nf} c_P file Pressure.dat
+fix f1 all ordern viscosity ${Nvis} ${Nwrite} c_P
+
+## computing diffusion coefficients
+compute positions all position
+fix f3 all ordern diffusivity ${Ndiff} ${Nwrite} c_positions
+
+## computing radial distribution function
+#compute rdf_extended all rdf/ext Nbin 1000 Nwrite 100 file rdf.dat
+#fix f4 all ave/time 1 1 1000 c_rdf_extended 
+
+thermo ${N_thermo}
+thermo_style custom step temp f_TempAve press f_PressAve pe f_PEAve ke f_KEAve etotal f_TEAve density
+thermo_modify flush yes
+
+dump NewSystem all atom ${Ndump} NPT_Equilibrium.lammpstrj
+
+# What interval should we use for the restart?
+restart ${nrestart} NPT.restart
+run ${nrun}
+print " All done! "
+
