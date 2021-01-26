@@ -117,11 +117,11 @@ def plot(title, xlabel, ylabel, grid, vals, labels, loglog=True, linear=None, sh
         return None
 
 # TODO: remove global variable in the future
-paths = ['./../data/CO2/4group/CO2_1m_50ns/run1/',
-         './../data/CO2/4group/CO2_1m_50ns/run2/',
-         './../data/CO2/4group/CO2_1m_50ns/run3/',
-         './../data/CO2/4group/CO2_1m_50ns/run4/',
-         './../data/CO2/4group/CO2_1m_50ns/run5/']
+paths = ['./../data/CO2/4group/CO2_2m_30ns/run1/',
+         './../data/CO2/4group/CO2_2m_30ns/run2/',
+         './../data/CO2/4group/CO2_2m_30ns/run3/',
+         './../data/CO2/4group/CO2_2m_30ns/run4/',
+         './../data/CO2/4group/CO2_2m_30ns/run5/']
 
 def plot_density():
     
@@ -131,7 +131,7 @@ def plot_density():
     # Read the lines and plot the results
     for i in range(len(filenames)):
         file = filenames[i]
-        lines = read_file_lines(file, [0, 11], skip=250, stop=551, column_major=True)
+        lines = read_file_lines(file, [0, 11], skip=246, stop=547, column_major=True)
         #plot('Plot of Density '+str(i+1), 'Timestep', 'Density (g/cm$^3$)', lines[0], lines[1:], ['Density'], loglog=False, linear=None, show_slope=False)
         density[i]=np.mean(lines[1])
     return density
@@ -151,11 +151,11 @@ def plot_diffusivity():
     # Particular filenames for diffusivity
     filenames = [path + 'selfdiffusivity.dat' for path in paths]
     #linearParts = [None for file in filenames]
-    linearParts = [[[13,-1],[12,31],[13,37],[11,25]],\
-                   [[12,-1],[12,30],[11,36],[11,36]],\
-                   [[12,-1],[19,37],[11,32],[11,29]],\
-                   [[12,-1],[11,36],[11,31],[11,36]],\
-                   [[11,-1],[11,31],[11,29],[12,37]]]
+    linearParts = [[[11,-1],[17,26],[10,-1],[11,36]],\
+                   [[11,-1],[12,-1],[10,27],[12,27]],\
+                   [[11,-1],[10,-1],[10,27],[11,27]],\
+                   [[10,-1],[13,32],[10,29],[11,27]],\
+                   [[11,-1],[7,36],[10,28],[10,27]]]
     # first dimension represents the run, second dimension the lines in every run.
     self_diff = np.zeros((len(filenames), 4))
     for i in range(len(filenames)):
@@ -171,11 +171,11 @@ def plot_viscosity():
     # Particular filenames for viscosity
     filenames = [path + 'viscosity.dat' for path in paths]
     #linearParts = [None for file in filenames]
-    linearParts = [[[15,44],[31,45]],\
-                   [[19,37],[31,45]],\
-                   [[18,45],[30,45]],\
-                   [[14,45],[37,45]],\
-                   [[13,45],[32,45]]]
+    linearParts = [[[25,45],[39,46]],\
+                   [[19,45],[37,45]],\
+                   [[20,45],[38,45]],\
+                   [[19,45],[37,45]],\
+                   [[20,45],[38,45]]]
     # first dimension represents the run, second dimension the lines in every run.
     visc = np.zeros((len(filenames), 2))
     for i in range(len(filenames)):
@@ -206,9 +206,9 @@ density = plot_density()
 
 #number of atoms for 1m
 N_water = 3000 # = 1000 molecules
-N_Cl    = 18   # = 18 molecules
-N_CO2   = 18   # = 6 molecules
-N_Na    = 18   # = 18 molecules
+N_Cl    = 36   # = 36 molecules
+N_CO2   = 15   # = 5 molecules
+N_Na    = 36   # = 36 molecules
 N = N_water + N_Cl + N_CO2 + N_Na #total number of atoms
 m_water = (2*1.00794+15.9994)/3  #avg mass of an atom in water
 m_Cl  = 35.4530                #mass of Cl-
@@ -243,8 +243,8 @@ for i in range(len(visc)):
 # visc[i][0] is shear viscosity of run i, visc[i][1] is bulk voscosity of run i.
 
 # Self diffusivity correction
-for i in range(len(self_diff[0])):
-    self_diff[:,i] += kB*T*xi/(6*np.pi*(visc[:,0]*1.01325e-10)*L) * 1e5
+#for i in range(len(self_diff[0])):
+#    self_diff[:,i] += kB*T*xi/(6*np.pi*(visc[:,0]*1.01325e-10)*L) * 1e5
 
 '''
 #Calculation of MS diffusivity from onsager coefficients for ternary mixture.

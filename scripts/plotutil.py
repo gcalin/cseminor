@@ -261,24 +261,24 @@ for i in range(len(self_diff[0])):
 #calculate average and standard deviation
 avg_dens = np.average(density, 0)
 std_dens = np.std(density, 0)
-print("Average density: %10.3e +/-%10.3e (%3.2f%%) g/cm^3." %(avg_dens, std_dens, std_dens/avg_dens*100))
+print("Average density: %10.3e +/-%10.3e (%3.2f%%) g/cm^3.\n" %(avg_dens, std_dens, std_dens/avg_dens*100))
 
 avg_diff = np.average(self_diff, 0)
 std_diff = np.std(self_diff, 0)
 
 print("Self-diffusion constant of Hydrogen:%10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[0], std_diff[0], std_diff[0]/avg_diff[0]*100))
-print("Self-diffusion constant of Oxygen:%10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s." %(avg_diff[1], std_diff[1], std_diff[1]/avg_diff[1]*100))
+print("Self-diffusion constant of Oxygen:%10.3e +/-%10.3e (%3.2f%%) angstrom^2/femtosecond = 10^-5 m^2/s.\n" %(avg_diff[1], std_diff[1], std_diff[1]/avg_diff[1]*100))
 
 avg_visc = np.average(visc, 0)
 std_visc = np.std(visc, 0)
 # documantation: https://www.geeksforgeeks.org/numpy-std-in-python/
 
 print("Shear viscosity of water:%10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[0],std_visc[0],std_visc[0]/avg_visc[0]*100))
-print("Bulk viscosity of water:%10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas." %(avg_visc[1],std_visc[1],std_visc[1]/avg_visc[1]*100))
+print("Bulk viscosity of water:%10.3e +/-%10.3e (%3.2f%%) atm*femtoseconds = 1.01325·10^−10 Pas.\n" %(avg_visc[1],std_visc[1],std_visc[1]/avg_visc[1]*100))
 
 plot_rdf()
 
-print("\nFound vs expected results")
+print("Found vs expected results")
 print("Density =%10.3e vs%10.3e" %(avg_dens,0.99705))
 print("Viscosity =%10.3e vs%10.3e" %(avg_visc[0]*(1.01325e-10),890.08e-6))
 # data for comparison from NIST database
