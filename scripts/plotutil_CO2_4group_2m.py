@@ -151,6 +151,11 @@ def plot_diffusivity():
     # Particular filenames for diffusivity
     filenames = [path + 'selfdiffusivity.dat' for path in paths]
     #linearParts = [None for file in filenames]
+    '''linearParts = [[[0,-1],[0,-1],[0,-1],[0,-1]],\
+                   [[0,-1],[0,-1],[0,-1],[0,-1]],\
+                   [[0,-1],[0,-1],[0,-1],[0,-1]],\
+                   [[0,-1],[0,-1],[0,-1],[0,-1]],\
+                   [[0,-1],[0,-1],[0,-1],[0,-1]]]'''
     linearParts = [[[11,-1],[17,26],[10,-1],[11,36]],\
                    [[11,-1],[12,-1],[10,27],[12,27]],\
                    [[11,-1],[10,-1],[10,27],[11,27]],\
@@ -243,8 +248,8 @@ for i in range(len(visc)):
 # visc[i][0] is shear viscosity of run i, visc[i][1] is bulk voscosity of run i.
 
 # Self diffusivity correction
-#for i in range(len(self_diff[0])):
-#    self_diff[:,i] += kB*T*xi/(6*np.pi*(visc[:,0]*1.01325e-10)*L) * 1e5
+for i in range(len(self_diff[0])):
+    self_diff[:,i] += kB*T*xi/(6*np.pi*(visc[:,0]*1.01325e-10)*L) * 1e5
 
 '''
 #Calculation of MS diffusivity from onsager coefficients for ternary mixture.
@@ -320,6 +325,7 @@ ion_cond = (e*e/(kB*T*V))*(1/2*N_Na*(q_Na)**2*self_diff[:,3] + 1/2*N_Cl*(q_Cl)**
 
 '''for calculating standard deviation when multiple runs are used.'''
 # calculate average and standard deviation over the different runs
+'''
 avg_dens = np.average(density, 0)
 std_dens = np.std(density, 0)
 print("Average density: %10.3e +/-%10.3e (%3.2f%%) g/cm^3.\n" %(avg_dens, std_dens, std_dens/avg_dens*100))
@@ -346,4 +352,32 @@ print("")
 avg_cond = np.average(ion_cond, 0)
 std_cond = np.std(ion_cond, 0)
 print("Electric conductivity: %10.3e +/-%10.3e (%3.2f%%) S/m." %(avg_cond, std_cond, std_cond/avg_cond*100))
+'''
 
+# Print results in SI units
+avg_dens = np.average(density, 0)
+std_dens = np.std(density, 0)
+print("Average density:\t%.4g +/- %.1g (%.1g%%) g/cm^3.\n" %(avg_dens, std_dens, std_dens/avg_dens*100))
+
+avg_diff = np.average(self_diff, 0)
+std_diff = np.std(self_diff, 0)
+diff_order = ["H2O", "Cl", "CO2", "Na"]
+for i in range(len(avg_diff)):
+    print("Self-diffusion constant of "+diff_order[i]+":\t%.4g +/- %.1g (%.1g%%) 10^-9 m^2/s." %(avg_diff[i]*1e4, std_diff[i]*1e4, std_diff[i]/avg_diff[i]*100))
+print("")
+
+avg_visc = np.average(visc, 0)
+std_visc = np.std(visc, 0)
+print("Shear viscosity of the system:\t%.4g +/- %.1g (%.1g%%) Pas." %(avg_visc[0]*1.01325e-10,std_visc[0]*1.01325e-10,std_visc[0]/avg_visc[0]*100))
+print("Bulk viscosity of the system:\t%.4g +/- %.1g (%.1g%%) Pas.\n" %(avg_visc[1]*1.01325e-10,std_visc[1]*1.01325e-10,std_visc[1]/avg_visc[1]*100))
+
+avg_MSdiff = np.average(MS_diff, 0)
+std_MSdiff = np.std(MS_diff, 0)
+MSdiff_order = [["H2O","Cl"], ["H2O", "CO2"], ["H2O", "Na"], ["Cl", "CO2"], ["Cl", "Na"], ["CO2", "Na"]]
+for i in range(len(avg_MSdiff)):
+    print("MS diffusivity of "+MSdiff_order[i][0]+" and "+MSdiff_order[i][1]+":\t%.4g +/- %.1g (%.1g%%) 10^-9 m^2/s." %(avg_MSdiff[i]*1e4,std_MSdiff[i]*1e4,std_MSdiff[i]/avg_MSdiff[i]*100))
+print("")
+
+avg_cond = np.average(ion_cond, 0)
+std_cond = np.std(ion_cond, 0)
+print("Electric conductivity:\t%.4g +/- %.1g (%.1g%%) S/m." %(avg_cond, std_cond, std_cond/avg_cond*100))
