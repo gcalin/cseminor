@@ -17,10 +17,10 @@ self_diff_ref_CO2 = np.array([7.22, 5.27])
 
 # dimension 1: 1m, 2m, 4m
 # dimension 2: shear, bulk
-visc = np.array([[2.66e-04, 1.2e-05],
-                 [3.2e-04, 6.9e-06]])
-visc_error = np.array([[9e-06, 1e-06],
-                       [1e-05 , 7e-07]])
+visc = np.array([[26.6, 1.2],
+                 [32, 0.69]])#*10^-5
+visc_error = np.array([[0.9, 0.1],
+                       [1, 0.07]])#*10^-5
 
 # dimension 1: 1m, 2m, 4m
 # dimension 2: H2O, Na, Cl, CO2
@@ -46,6 +46,7 @@ plt.plot(x, density_ref, '--')
 plt.errorbar(x, density, density_error, capsize = 3)
 plt.ylabel("density ($g/cm^3$)")
 plt.xlabel("molality ($m$)")
+plt.ylim((0.9,1.1))
 plt.legend(("MD reference", "measurements"))
 
 plt.figure("Self diffusivity")
@@ -57,13 +58,12 @@ plt.ylabel("self-diffusivity ($10^{-9} m^2/s$)")
 plt.xlabel("molality ($m$)")
 plt.legend(("$CO_2$ MD reference", "$H_2O$", "$Na^+$", "$Cl^-$", "$CO_2$"))
 
+# only plot shear viscosity
 plt.figure("Viscosity")
 plt.clf()
-for i in range(len(visc[0])):
-    plt.errorbar(x, visc[:,i], visc_error[:,i], capsize = 3)
-plt.ylabel("viscosity ($Pa s$)")
+plt.errorbar(x, visc[:,0], visc_error[:,0], capsize = 3)
+plt.ylabel("viscosity ($10^{-5} Pa s$)")
 plt.xlabel("molality ($m$)")
-plt.legend(("shear", "bulk"))
 
 plt.figure("MS diffusivity")
 plt.clf()
@@ -71,23 +71,23 @@ for i in range(len(MS_diff[0])):
     plt.errorbar(x, MS_diff[:,i], MS_diff_error[:,i], capsize = 3)
 plt.ylabel("MS-diffusivity ($10^{-9} m^2/s$)")
 plt.xlabel("molality ($m$)")
-plt.legend(("$H_2O-Na^+$", "$H_2O-Cl^-$", "$H_2O-CO_2$", "$Na^+-Cl^-$", "$Na^+-CO_2$", "$Cl^--CO_2$"))
+#plt.legend(("$D^{MS}_{H_2O-Na^+}$", "$D^{MS}_{H_2O-Cl^-}$", "$D^{MS}_{H_2O-CO_2}$", "$D^{MS}_{Na^+-Cl^-}$", "$D^{MS}_{Na^+-CO_2}$", "$D^{MS}_{Cl^--CO_2}$"))
 
 plt.figure("MS diffusivity reference")
 plt.clf()
-plt.errorbar(x, MS_diff_ref_CO2, MS_diff_ref_CO2_error, ls='--' , capsize = 3)
-plt.errorbar(x, MS_diff_ref2_CO2, MS_diff_ref2_CO2_error, ls='--' , capsize = 3)
+plt.plot(x, MS_diff_ref_CO2, ls='--')
+plt.plot(x, MS_diff_ref2_CO2, ls='--')
 plt.errorbar(x, MS_diff[:,2], MS_diff_error[:,2], capsize = 3)
 plt.errorbar(x, MS_diff[:,4], MS_diff_error[:,4], capsize = 3)
 plt.errorbar(x, MS_diff[:,5], MS_diff_error[:,5], capsize = 3)
 plt.ylabel("MS-diffusivity ($10^{-9} m^2/s$)")
 plt.xlabel("molality ($m$)")
-plt.legend(("$CO_2$-brine MD reference Einstein", "$CO_2$-brine MD reference Green-Kubo", "$H_2O-CO_2$", "$Na^+-CO_2$", "$Cl^--CO_2$"))
+#plt.legend(("$D^{MS}_{CO_2-brine}$ MD reference Einstein", "$D^{MS}_{CO_2-brine}$ MD reference Green-Kubo", "$D^{MS}_{H_2O-CO_2}$", "$D^{MS}_{Na^+-CO_2}$", "$D^{MS}_{Cl^--CO_2}$"))
 
 plt.figure("Ionic conductivity")
 plt.clf()
-plt.errorbar(x, cond_ref, cond_ref_error, ls='--', capsize = 3)
-plt.errorbar(x, cond_ref2, cond_ref2_error, ls='--', capsize = 3)
+plt.plot(x, cond_ref, ls='--')
+plt.plot(x, cond_ref2, ls='--')
 plt.errorbar(x, cond, cond_error, capsize = 3)
 plt.ylabel("Ionic conductivity ($S/m$)")
 plt.xlabel("molality ($m$)")
