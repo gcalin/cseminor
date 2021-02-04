@@ -212,7 +212,7 @@ N_Na    = 18   # = 18 molecules
 N = N_water + N_Cl + N_CO2 + N_Na #total number of atoms
 m_water = (2*1.00794+15.9994)/3  #avg mass of an atom in water
 m_Cl  = 35.4530                #mass of Cl-
-m_CO2   = (12.0107+2*15.9994)/3  #avg mass on an atom in CO1
+m_CO2   = (12.0107+2*15.9994)/3  #avg mass on an atom in CO2
 m_Na  = 22.9898                #mass of Na+
 N_avogadro = 6.02214076e23 
 m = (N_water*m_water + N_Cl*m_Cl + N_CO2*m_CO2 + N_Na*m_Na)/N_avogadro
@@ -234,6 +234,13 @@ for i in range(len(self_diff)):
         self_diff[i][2] = self_diff[i][2]/N_CO2 #CO2
         self_diff[i][3] = self_diff[i][3]/N_Na #Na
     
+
+avg_diff = np.average(self_diff, 0)
+std_diff = np.std(self_diff, 0)
+diff_order = ["H2O", "Cl", "CO2", "Na"]
+for i in range(len(avg_diff)):
+    print("Uncorrected self-diffusion constant of "+diff_order[i]+":\t%.4g +/- %.1g (%.1g%%) 10^-9 m^2/s." %(avg_diff[i]*1e4, std_diff[i]*1e4, std_diff[i]/avg_diff[i]*100))
+print("")
 
 visc = plot_viscosity()
 for i in range(len(visc)):

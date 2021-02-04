@@ -51,7 +51,7 @@ velocity all create ${Temp} ${RandomSeed}
 thermo ${N_thermo}
 
 # Just to minimize the whole system correctly
-timestep 0.0001
+timestep 
 run 10000 
 timestep 0.0002
 run 10000 

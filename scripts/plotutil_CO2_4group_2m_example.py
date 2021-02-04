@@ -218,25 +218,6 @@ def plot_viscosity():
                        ['MSD_all', 'MSD_bulkvisc'], linear=linearPart)
     return visc
 
-def plot_onsager_coef():
-
-    # Particular filenames for diffusivity
-    filenames = [path + 'onsagercoefficient.dat' for path in paths]
-    linearParts = [None for file in filenames] #[None for file in filenames]
-    onsager_coef = np.zeros((len(filenames), 6))
-    for i in range(len(filenames)):
-        file = filenames[i]
-        linearPart = linearParts[i]
-        # Read the lines and plot the results
-        lines = read_file_lines(file, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
-                                skip=2, column_major=True)
-        onsager_coef[i,:]=plot('Plot of onsager coefficients '+str(i+1), 
-                               'Time (fs)', r'$MSD_{Onsager}$', lines[0], 
-                               lines[1:], ['H2O-H2O', 'H2O-Cl', 'H2O-CO2', 
-                               'H2O-Na', 'Cl-Cl', 'Cl-CO2', 'Cl-Na', 'CO2-CO2', 
-                               'CO2-Na', 'Na-Na'], linear=linearPart, loglog=True)   
-    return onsager_coef
-
 density = plot_density()
 # Uncomment next line to check energy plots
 #plot_total_energy()
@@ -289,15 +270,6 @@ for i in range(len(visc)):
 # Self diffusivity correction
 for i in range(len(self_diff[0])):
     self_diff[:,i] += kB*T*xi/(6*np.pi*(visc[:,0]*1.01325e-10)*L) * 1e5
-
-'''
-#Calculation of MS diffusivity from onsager coefficients for ternary mixture.
-onsager_coef = plot_onsager_coef()
-for i in range(len(onsager_coef)):
-    if ((onsager_coef[i] != None).all()):
-        for j in range(len(onsager_coef[i])):
-            onsager_coef[i][j]=onsager_coef[i][j]/N
-'''
 
 # molar fractions
 x_water = N_water/N 
